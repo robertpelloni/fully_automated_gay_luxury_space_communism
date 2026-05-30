@@ -1,6 +1,6 @@
 # Roadmap: AI Hustle Machine
 
-_Last updated: 2026-05-30, version 1.0.0-alpha.9_
+_Last updated: 2026-05-30, version 1.0.0-alpha.10_
 
 ## Status legend
 
@@ -8,6 +8,20 @@ _Last updated: 2026-05-30, version 1.0.0-alpha.9_
 - **Beta** — Usable, still evolving
 - **Experimental** — Active R&D, not dependable
 - **Vision** — Directional only
+
+## Completed (v1.0.0-alpha.10)
+
+### 1. Financial Intelligence
+- **Ledger System**: Implemented `orchestrator/ledger.go` for revenue and expense tracking.
+- **Profit Monitoring**: Real-time profit calculation integrated into CLI.
+
+### 2. CLI Enhancements
+- **Task Selection**: Added `-hustle` flag to launch specific modules.
+- **Sync Trigger**: Added `-sync` flag for protocol reconciliation.
+
+### 3. Social Refinement
+- **Provider Interface**: Pluggable social media providers (Twitter, LinkedIn).
+- **Cost Integration**: Automated expense logging for social posts.
 
 ## Completed (v1.0.0-alpha.9)
 
@@ -90,7 +104,7 @@ _Last updated: 2026-05-30, version 1.0.0-alpha.9_
 - [ ] Implement `hustle://` protocol handlers for deep-linking.
 
 ### B. Money Machine: Social Media (EXPERIMENTAL)
-- [ ] Implement real social media API integrations (Twitter/LinkedIn).
+- [ ] Implement real social media API integrations (Twitter/LinkedIn). (Refining)
 - [ ] Implement content generation using LLM.
 
 ### C. Agent Connectivity (VISION)

@@ -2,9 +2,10 @@
 
 ## Immediate Tasks
 - [ ] Integrate `sqlite-vec` for hyper-fast, local-first context matching.
-- [ ] Implement real social media API integrations (Twitter/LinkedIn stubs).
+- [ ] Wire the Research hustle module to the Orchestrator's memory and orchestration pipeline.
 - [ ] Implement real web search integration (API calls).
-- [ ] Implement PDF export using a Go library (e.g., gofpdf).
+- [ ] Implement PDF export using a Go library.
+- [ ] Add profit/loss visualization to STATUS.json.
 
 ## Future Tasks
 - [ ] Implement A2A Mesh for cross-host collaboration.

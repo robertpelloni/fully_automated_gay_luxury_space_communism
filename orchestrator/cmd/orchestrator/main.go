@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"github.com/robertpelloni/hustle/orchestrator"
 	"os"
@@ -8,6 +9,10 @@ import (
 )
 
 func main() {
+	hustleTask := flag.String("hustle", "", "Run a specific hustle module (research, social)")
+	syncMode := flag.Bool("sync", false, "Run repository synchronization protocol")
+	flag.Parse()
+
 	fmt.Println("=== AI Hustle Machine Orchestrator ===")
 
 	// Source version from VERSION.md
@@ -20,8 +25,18 @@ func main() {
 	orch := orchestrator.NewOrchestrator()
 
 	// Real-time status reporting
-	orchestrator.WriteStatusReport(version, "Running", "Orchestrator started successfully")
+	orchestrator.WriteStatusReport(version, "Running", "Orchestrator command processed")
 
-	fmt.Printf("Orchestrator (v%s) initialized with L1: %d, L2: %d, L3: %d entries.\n",
-		version, len(orch.L1.Entries), len(orch.L2.Entries), len(orch.L3.Entries))
+	if *syncMode {
+		fmt.Println("Triggering repository sync protocol...")
+		// In a real app, this would execute sync.sh or internal git logic
+	}
+
+	if *hustleTask != "" {
+		fmt.Printf("Launching hustle module: %s\n", *hustleTask)
+		// Module selection logic would go here
+	}
+
+	fmt.Printf("Orchestrator (v%s) initialized with L1: %d, L2: %d, L3: %d entries. Profit: $%.2f\n",
+		version, len(orch.L1.Entries), len(orch.L2.Entries), len(orch.L3.Entries), orch.Ledger.Profit())
 }

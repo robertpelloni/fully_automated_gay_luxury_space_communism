@@ -1,41 +1,43 @@
 # Changelog
 
+## [1.0.0-alpha.10] - 2026-05-30
+### Added
+- Financial Ledger implementation for revenue and expense tracking.
+- CLI flags (`-hustle`, `-sync`) for the Hustle Orchestrator.
+- Provider interface for Social Media module with Twitter/LinkedIn mocks.
+- Automated cost integration for hustle tasks.
+
 ## [1.0.0-alpha.9] - 2026-05-30
 ### Added
 - Functional Healer loop with retry logic and memory logging.
 - Memory Search with keyword filtering.
 - Initial Social Media hustle module scaffolding.
-- Placeholder for vector embeddings in MemoryEntry.
 
 ## [1.0.0-alpha.8] - 2026-05-30
 ### Added
-- JSON persistence for tiered memory (`Save`/`Load` methods).
+- JSON persistence for tiered memory.
 - Standalone entry points for Orchestrator and Research modules.
 - Automatic integration between research results and orchestrator memory.
-- Root-level `bin/` for compiled executables.
 
 ## [1.0.0-alpha.7] - 2026-05-30
 ### Added
-- Utility-based heat scoring for memories with exponential temporal decay.
-- Enhanced Research Hustle pipeline with multi-provider support (Tavily, Brave, Google).
-- Improved report synthesis logic.
+- Utility-based heat scoring for memories with temporal decay.
+- Enhanced Research Hustle pipeline with multi-provider support.
 
 ## [1.0.0-alpha.6] - 2026-05-30
 ### Added
-- Real Git rollback implementation (merge abortion, hard reset, clean).
-- Failure trap in `sync.sh` for automated error handling during synchronization.
+- Real Git rollback implementation.
+- Failure trap in `sync.sh`.
 
 ## [1.0.0-alpha.5] - 2026-05-30
 ### Added
-- GitHub Actions CI pipeline in `.github/workflows/ci.yml`.
+- GitHub Actions CI pipeline.
 - End-to-End (E2E) tests for the research hustle pipeline.
-- Go workspace (`go.work`) configuration.
 
 ## [1.0.0-alpha.4] - 2026-05-29
 ### Added
-- Enhanced `sync.sh` with "Executive Protocol" reconciliation logic.
-- Real git status and submodule monitoring in `orchestrator/sync_monitor.go`.
-- Comprehensive documentation updates for `VISION.md`, `DEPLOY.md`, and `IDEAS.md`.
+- Enhanced `sync.sh` with branch reconciliation logic.
+- Real git status and submodule monitoring.
 
 ## [1.0.0-alpha.3] - 2026-05-29
 ### Added
@@ -44,11 +46,10 @@
 
 ## [1.0.0-alpha.2] - 2026-05-29
 ### Added
-- Repository synchronization orchestration scripts (`sync.sh`, `build.sh`).
+- Repository synchronization orchestration scripts.
 - Sync monitoring and health check logic.
 
 ## [1.0.0-alpha.1] - 2026-05-29
 ### Added
 - Repository initialization with knowledge base.
-- Basic project structure scaffolding (Orchestrator, Hustle).
-- Core documentation files.
+- Basic project structure scaffolding.

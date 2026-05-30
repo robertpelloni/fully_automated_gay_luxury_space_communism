@@ -82,18 +82,20 @@ func (m *L3Memory) Search(query string) []MemoryEntry {
 	return results
 }
 
-// Orchestrator handles tiered memory orchestration
+// Orchestrator handles tiered memory orchestration and financial tracking
 type Orchestrator struct {
-	L1 L1Memory `json:"l1"`
-	L2 L2Memory `json:"l2"`
-	L3 L3Memory `json:"l3"`
+	L1     L1Memory `json:"l1"`
+	L2     L2Memory `json:"l2"`
+	L3     L3Memory `json:"l3"`
+	Ledger Ledger   `json:"ledger"`
 }
 
 func NewOrchestrator() *Orchestrator {
 	return &Orchestrator{
-		L1: L1Memory{Entries: make([]MemoryEntry, 0)},
-		L2: L2Memory{Entries: make([]MemoryEntry, 0)},
-		L3: L3Memory{Entries: make([]MemoryEntry, 0)},
+		L1:     L1Memory{Entries: make([]MemoryEntry, 0)},
+		L2:     L2Memory{Entries: make([]MemoryEntry, 0)},
+		L3:     L3Memory{Entries: make([]MemoryEntry, 0)},
+		Ledger: Ledger{Transactions: make([]Transaction, 0)},
 	}
 }
 
