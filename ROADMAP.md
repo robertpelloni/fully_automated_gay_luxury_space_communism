@@ -1,6 +1,6 @@
 # Roadmap: AI Hustle Machine
 
-_Last updated: 2026-05-30, version 1.0.0-alpha.20_
+_Last updated: 2026-05-30, version 1.0.0-alpha.21_
 
 ## Status legend
 
@@ -8,6 +8,14 @@ _Last updated: 2026-05-30, version 1.0.0-alpha.20_
 - **Beta** — Usable, still evolving
 - **Experimental** — Active R&D, not dependable
 - **Vision** — Directional only
+
+## Completed (v1.0.0-alpha.21)
+
+### 1. Robust Scheduling
+- **Task Persistence**: Implemented `SaveState`/`LoadState` in `orchestrator/scheduler.go` to persist task history in `tasks.json`.
+
+### 2. Curation module
+- **Scaffolding**: Initial module for automated content curation and newsletter generation.
 
 ## Completed (v1.0.0-alpha.20)
 
@@ -190,7 +198,7 @@ _Last updated: 2026-05-30, version 1.0.0-alpha.20_
 ### B. Money Machine: Real-World Execution (EXPERIMENTAL)
 - [ ] Implement real social media API integrations (Twitter/LinkedIn). (Refining)
 - [ ] Implement real web search integration (API calls). (Functional)
-- [ ] Automate daily hustle scheduling. (Refining)
+- [ ] Daily hustle task scheduler. (Functional)
 
 ### C. Agent Connectivity (VISION)
 - [ ] Implement A2A Mesh for cross-host agent collaboration.

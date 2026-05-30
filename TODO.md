@@ -4,7 +4,7 @@
 - [ ] Integrate `sqlite-vec` for hyper-fast, local-first context matching.
 - [ ] Implement real social media API integrations (Twitter/LinkedIn).
 - [ ] Implement rate-limiting logic for API clients.
-- [ ] Expand Scheduler with persistence for task state.
+- [ ] Implement real feed fetcher for curation module.
 
 ## Future Tasks
 - [ ] Implement A2A Mesh for cross-host collaboration.
