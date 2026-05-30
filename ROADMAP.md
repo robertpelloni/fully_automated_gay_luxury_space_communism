@@ -1,6 +1,6 @@
 # Roadmap: AI Hustle Machine
 
-_Last updated: 2026-05-30, version 1.0.0-alpha.22_
+_Last updated: 2026-05-30, version 1.0.0-alpha.23_
 
 ## Status legend
 
@@ -8,6 +8,13 @@ _Last updated: 2026-05-30, version 1.0.0-alpha.22_
 - **Beta** — Usable, still evolving
 - **Experimental** — Active R&D, not dependable
 - **Vision** — Directional only
+
+## Completed (v1.0.0-alpha.23)
+
+### 1. Vector Intelligence (EXPERIMENTAL)
+- **Vector Storage**: Added `embedding` BLOB support to `SQLiteStore`.
+- **Embedding Interface**: Defined `EmbeddingProvider` for pluggable vector generation.
+- **Semantic Scaffolding**: Updated tiered memory to support vector-aware `RankedSearch`.
 
 ## Completed (v1.0.0-alpha.22)
 

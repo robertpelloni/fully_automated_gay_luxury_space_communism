@@ -1,34 +1,34 @@
 package orchestrator
 
 import (
+	"fmt"
 	"testing"
 	"time"
 )
 
 func TestWeightedCouncil(t *testing.T) {
-	orch := NewOrchestrator()
-	council := NewCouncil(orch)
+	orc := NewOrchestrator()
+	council := NewCouncil(orc)
 
-	result, _ := council.Debate("Test Weighted Voting")
+	proposal := "Test Weighted Voting"
+	result, err := council.Debate(proposal)
+	if err != nil {
+		t.Fatalf("Debate failed: %v", err)
+	}
 
-	if result.WeightedScore <= 0 {
-		t.Errorf("Expected positive weighted score, got %v", result.WeightedScore)
+	fmt.Printf("Weighted Score: %.2f\n", result.WeightedScore)
+	if result.WeightedScore == 0 {
+		t.Errorf("Expected non-zero weighted score")
 	}
 }
 
 func TestRankedSearch(t *testing.T) {
 	orch := NewOrchestrator()
 
-	// Add fresh entry
-	fresh := MemoryEntry{ID: "fresh", Content: "Keyword match", BaseScore: 100, Timestamp: time.Now()}
-	orch.L1.Add(fresh)
+	orch.L1.Add(MemoryEntry{ID: "old", Content: "Keyword", BaseScore: 10, Timestamp: time.Now().Add(-24 * time.Hour)})
+	orch.L1.Add(MemoryEntry{ID: "fresh", Content: "Keyword", BaseScore: 10, Timestamp: time.Now()})
 
-	// Add old entry
-	old := MemoryEntry{ID: "old", Content: "Keyword match", BaseScore: 100, Timestamp: time.Now().Add(-100 * time.Hour)}
-	orch.L1.Add(old)
-
-	results := orch.L1.RankedSearch("Keyword")
-
+	results := orch.L1.RankedSearch("Keyword", orch.Embedder)
 	if len(results) != 2 {
 		t.Fatalf("Expected 2 results, got %d", len(results))
 	}

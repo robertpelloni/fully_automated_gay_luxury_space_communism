@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.0.0-alpha.23] - 2026-05-30
+### Added
+- **Vector Memory (BETA)**: Implemented vector storage and retrieval scaffold in `SQLiteStore`.
+- **Semantic Search (EXPERIMENTAL)**: Added `EmbeddingProvider` interface and updated `RankedSearch` to support future vector re-ranking.
+- **Mock Embedder**: Added `MockEmbedder` for testing semantic search pipelines.
+
 ## [1.0.0-alpha.22] - 2026-05-30
 ### Added
 - **Curation Module: Real Feeds (BETA)**: Integrated `gofeed` to fetch and process real RSS/Atom feeds for content curation.

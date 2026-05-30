@@ -9,6 +9,21 @@ type LLMProvider interface {
 	Generate(prompt string) (string, error)
 }
 
+type EmbeddingProvider interface {
+	Embed(text string) ([]float32, error)
+}
+
+type MockEmbedder struct{}
+
+func (m *MockEmbedder) Embed(text string) ([]float32, error) {
+	// Return a dummy 128-dim vector
+	vec := make([]float32, 128)
+	for i := range vec {
+		vec[i] = float32(i) / 128.0
+	}
+	return vec, nil
+}
+
 type MockLLM struct {
 	Response string
 }
