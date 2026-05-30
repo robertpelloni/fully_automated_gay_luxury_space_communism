@@ -1,10 +1,10 @@
 # Todo List
 
 ## Immediate Tasks
-- [ ] Implement utility-based scoring and temporal decay for all memories.
 - [ ] Integrate `sqlite-vec` for hyper-fast, local-first context matching.
-- [ ] Wire the Research hustle module to the Orchestrator's memory and orchestration pipeline.
-- [ ] Implement real web search integration.
+- [ ] Implement real web search integration (API calls).
+- [ ] Implement PDF export using a Go library (e.g., gofpdf).
+- [ ] Add CLI flags to `orchestrator` and `research` entry points.
 
 ## Future Tasks
 - [ ] Implement A2A Mesh for cross-host collaboration.

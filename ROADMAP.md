@@ -1,6 +1,6 @@
 # Roadmap: AI Hustle Machine
 
-_Last updated: 2026-05-30, version 1.0.0-alpha.5_
+_Last updated: 2026-05-30, version 1.0.0-alpha.8_
 
 ## Status legend
 
@@ -8,6 +8,31 @@ _Last updated: 2026-05-30, version 1.0.0-alpha.5_
 - **Beta** — Usable, still evolving
 - **Experimental** — Active R&D, not dependable
 - **Vision** — Directional only
+
+## Completed (v1.0.0-alpha.8)
+
+### 1. Persistence & Portability
+- **JSON Storage**: Tiered memory can now be saved to and loaded from `memory.json`.
+- **Runnable Binaries**: Dedicated entry points for Orchestrator and Research in `bin/`.
+
+### 2. Module Integration
+- **Unified Memory**: Research module now automatically populates Orchestrator L1/L2 memory.
+
+## Completed (v1.0.0-alpha.7)
+
+### 1. Advanced Memory Mechanics
+- **Heat Scoring**: Utility-based scoring system for all memories.
+- **Temporal Decay**: Implemented exponential decay logic in `orchestrator/memory.go`.
+
+### 2. Research Refinement
+- **Multi-Provider**: Search interface now supports Tavily, Brave, and Google providers.
+- **Synthesis Engine**: Enhanced report generation logic for deeper intelligence.
+
+## Completed (v1.0.0-alpha.6)
+
+### 1. Robust Rollbacks
+- **Failure Handler**: Automatic merge abortion in `sync.sh`.
+- **Git Recovery**: Full hard-reset and cleanup logic in `orchestrator/rollback.go`.
 
 ## Completed (v1.0.0-alpha.5)
 
@@ -45,17 +70,15 @@ _Last updated: 2026-05-30, version 1.0.0-alpha.5_
 - **Biological Tiered Memory**: L1 (Scratchpad), L2 (Vault), L3 (Archive) skeletons in Go.
 - **Autonomous Healing**: Multi-turn Healer loop skeleton.
 
-## Active Sprint: Phase 1 - Scaffolding & Research
+## Active Sprint: Phase 2 - Intelligent Scaling
 
 ### A. Core Orchestration (EXPERIMENTAL)
-- [ ] Implement utility-based scoring and temporal decay for all memories.
 - [ ] Integrate `sqlite-vec` for hyper-fast, local-first context matching.
 - [ ] Implement `hustle://` protocol handlers for deep-linking.
 
 ### B. Money Machine: Research Hustle (EXPERIMENTAL)
-- [ ] Implement real web search integration.
-- [ ] Implement report synthesis logic.
-- [ ] Implement PDF export using a Go library.
+- [ ] Implement real web search integration (API calls).
+- [ ] Implement PDF export using a Go library (e.g., gofpdf).
 
 ### C. Agent Connectivity (VISION)
 - [ ] Implement A2A Mesh for cross-host agent collaboration.
