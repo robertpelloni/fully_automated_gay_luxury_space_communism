@@ -28,12 +28,17 @@ func (p *LinkedInProvider) Post(content string) error {
 	return nil
 }
 
-func GenerateContent(topic string) string {
-	return fmt.Sprintf("Revolutionary insights on %s! #hustle #ai", topic)
+func GenerateContent(orch *orchestrator.Orchestrator, topic string) string {
+	prompt := fmt.Sprintf("Create a short, revolutionary social media post about %s with hashtags.", topic)
+	content, err := orch.LLM.Generate(prompt)
+	if err != nil {
+		return fmt.Sprintf("Revolutionary insights on %s! #hustle #ai", topic)
+	}
+	return content
 }
 
 func SchedulePost(orch *orchestrator.Orchestrator, provider Provider, platform, topic string) {
-	content := GenerateContent(topic)
+	content := GenerateContent(orch, topic)
 	fmt.Printf("Scheduling post for %s: %s\n", platform, content)
 
 	err := provider.Post(content)
@@ -45,7 +50,6 @@ func SchedulePost(orch *orchestrator.Orchestrator, provider Provider, platform, 
 			Tags:      []string{"social", platform},
 		})
 
-		// Log minimal expense for API usage
 		orch.Ledger.Add(orchestrator.Transaction{
 			Amount: 0.01,
 			Type:   orchestrator.Expense,

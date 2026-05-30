@@ -3,11 +3,16 @@ package main
 import (
 	"fmt"
 	"github.com/robertpelloni/hustle/hustle/research"
+	"github.com/robertpelloni/hustle/orchestrator"
 )
 
 func main() {
 	fmt.Println("=== Hustle Research Module ===")
-	searcher := &research.ResearchSearch{ActiveProvider: research.Tavily}
+	orch := orchestrator.NewOrchestrator()
+	searcher := &research.ResearchSearch{
+		ActiveProvider: research.Tavily,
+		Orchestrator:   orch,
+	}
 
 	query := "Latest trends in AI agent orchestration"
 	fmt.Printf("Running research for: %s\n", query)
@@ -19,7 +24,7 @@ func main() {
 	}
 
 	report := &research.Report{Title: "AI Trends 2026"}
-	report.Synthesize(results)
+	report.Synthesize(orch, results)
 
 	fmt.Println("Synthesis Complete.")
 	fmt.Println(report.Content)

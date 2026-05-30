@@ -1,6 +1,6 @@
 # Roadmap: AI Hustle Machine
 
-_Last updated: 2026-05-30, version 1.0.0-alpha.10_
+_Last updated: 2026-05-30, version 1.0.0-alpha.11_
 
 ## Status legend
 
@@ -8,6 +8,19 @@ _Last updated: 2026-05-30, version 1.0.0-alpha.10_
 - **Beta** — Usable, still evolving
 - **Experimental** — Active R&D, not dependable
 - **Vision** — Directional only
+
+## Completed (v1.0.0-alpha.11)
+
+### 1. Financial Reporting
+- **Enriched Status**: `STATUS.json` now includes Revenue, Expenses, and Profit.
+- **Profit Tracking**: Core CLI outputs real-time profit metrics.
+
+### 2. AI Orchestration
+- **LLM Layer**: Implemented `LLMProvider` interface for pluggable AI models.
+- **Synthesized Hustle**: Research and Social modules now utilize the Orchestrator's LLM for content generation.
+
+### 3. CLI Evolution
+- **Parameterized Execution**: Added `-params` flag for module configuration.
 
 ## Completed (v1.0.0-alpha.10)
 
@@ -103,9 +116,10 @@ _Last updated: 2026-05-30, version 1.0.0-alpha.10_
 - [ ] Integrate `sqlite-vec` for hyper-fast, local-first context matching.
 - [ ] Implement `hustle://` protocol handlers for deep-linking.
 
-### B. Money Machine: Social Media (EXPERIMENTAL)
+### B. Money Machine: Content Generation (EXPERIMENTAL)
 - [ ] Implement real social media API integrations (Twitter/LinkedIn). (Refining)
-- [ ] Implement content generation using LLM.
+- [ ] Implement real web search integration (API calls).
+- [ ] Implement PDF export using a Go library.
 
 ### C. Agent Connectivity (VISION)
 - [ ] Implement A2A Mesh for cross-host agent collaboration.

@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.0-alpha.11] - 2026-05-30
+### Added
+- Integrated Revenue, Expenses, and Profit into `STATUS.json` reporting.
+- Pluggable `LLMProvider` interface with `MockLLM` implementation.
+- Orchestrator-wide LLM access for all hustle modules.
+- LLM-driven synthesis in Research and Social Media modules.
+- Parameterized execution via `-params` flag in Orchestrator CLI.
+
 ## [1.0.0-alpha.10] - 2026-05-30
 ### Added
 - Financial Ledger implementation for revenue and expense tracking.
