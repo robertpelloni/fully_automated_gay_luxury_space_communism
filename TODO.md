@@ -1,10 +1,9 @@
 # Todo List
 
 ## Immediate Tasks
-- [ ] Scaffold Go Orchestrator (`orchestrator/` directory).
-- [ ] Implement L1/L2/L3 memory structures in Go.
-- [ ] Implement Healer loop skeleton.
-- [ ] Scaffold "Research/Consulting" side hustle module.
+- [ ] Implement utility-based scoring and temporal decay for all memories.
+- [ ] Integrate `sqlite-vec` for hyper-fast, local-first context matching.
+- [ ] Wire the Research hustle module to the Orchestrator's memory and orchestration pipeline.
 
 ## Future Tasks
 - [ ] Implement A2A Mesh for cross-host collaboration.

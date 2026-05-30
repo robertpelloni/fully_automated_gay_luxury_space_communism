@@ -1,6 +1,6 @@
 # Roadmap: AI Hustle Machine
 
-_Last updated: 2026-05-29, version 1.0.0-alpha.1_
+_Last updated: 2026-05-29, version 1.0.0-alpha.2_
 
 ## Status legend
 
@@ -8,6 +8,13 @@ _Last updated: 2026-05-29, version 1.0.0-alpha.1_
 - **Beta** — Usable, still evolving
 - **Experimental** — Active R&D, not dependable
 - **Vision** — Directional only
+
+## Completed (v1.0.0-alpha.2)
+
+### 1. Sync & Automation
+- **Orchestration**: `sync.sh` and `build.sh` for autonomous repo maintenance.
+- **Monitoring**: Health check logic and sync monitoring.
+- **Reliability**: Unit tests for sync edge cases.
 
 ## Completed (v1.0.0-alpha.1)
 
