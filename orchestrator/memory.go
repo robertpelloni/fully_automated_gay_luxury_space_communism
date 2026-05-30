@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"math"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -14,6 +15,7 @@ type MemoryEntry struct {
 	BaseScore float64   `json:"base_score"`
 	Timestamp time.Time `json:"timestamp"`
 	Tags      []string  `json:"tags"`
+	Vector    []float32 `json:"vector,omitempty"` // Placeholder for semantic embeddings
 }
 
 // Score calculates the current "heat" of the memory with temporal decay
@@ -33,7 +35,13 @@ func (m *L1Memory) Add(entry MemoryEntry) {
 }
 
 func (m *L1Memory) Search(query string) []MemoryEntry {
-	return m.Entries
+	var results []MemoryEntry
+	for _, entry := range m.Entries {
+		if strings.Contains(strings.ToLower(entry.Content), strings.ToLower(query)) {
+			results = append(results, entry)
+		}
+	}
+	return results
 }
 
 // L2Memory (Vault) - Long-term historical patterns
@@ -46,7 +54,13 @@ func (m *L2Memory) Add(entry MemoryEntry) {
 }
 
 func (m *L2Memory) Search(query string) []MemoryEntry {
-	return m.Entries
+	var results []MemoryEntry
+	for _, entry := range m.Entries {
+		if strings.Contains(strings.ToLower(entry.Content), strings.ToLower(query)) {
+			results = append(results, entry)
+		}
+	}
+	return results
 }
 
 // L3Memory (Archive) - Archived decisions and cold storage
@@ -59,7 +73,13 @@ func (m *L3Memory) Add(entry MemoryEntry) {
 }
 
 func (m *L3Memory) Search(query string) []MemoryEntry {
-	return m.Entries
+	var results []MemoryEntry
+	for _, entry := range m.Entries {
+		if strings.Contains(strings.ToLower(entry.Content), strings.ToLower(query)) {
+			results = append(results, entry)
+		}
+	}
+	return results
 }
 
 // Orchestrator handles tiered memory orchestration

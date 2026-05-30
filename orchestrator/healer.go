@@ -2,41 +2,67 @@ package orchestrator
 
 import (
 	"fmt"
+	"time"
 )
 
 type Healer struct {
 	Orchestrator *Orchestrator
+	RetryLimit   int
+	RetryCount   int
 }
 
 func NewHealer(o *Orchestrator) *Healer {
-	return &Healer{Orchestrator: o}
+	return &Healer{
+		Orchestrator: o,
+		RetryLimit:   3,
+		RetryCount:   0,
+	}
 }
 
 func (h *Healer) Diagnose(issue string) string {
 	fmt.Printf("Diagnosing issue: %s\n", issue)
+	// Log diagnosis to memory
+	h.Orchestrator.L1.Add(MemoryEntry{
+		ID:        fmt.Sprintf("diag-%d", time.Now().Unix()),
+		Content:   fmt.Sprintf("Issue: %s, Diagnosis: Incomplete system state", issue),
+		Timestamp: time.Now(),
+		Tags:      []string{"healer", "diagnosis"},
+	})
 	return "Diagnosis complete"
 }
 
 func (h *Healer) Fix(diagnosis string) bool {
-	fmt.Printf("Applying fix based on: %s\n", diagnosis)
+	h.RetryCount++
+	fmt.Printf("Applying fix attempt %d/%d based on: %s\n", h.RetryCount, h.RetryLimit, diagnosis)
 	return true
 }
 
 func (h *Healer) Verify(fix string) bool {
 	fmt.Printf("Verifying fix: %s\n", fix)
-	// For demonstration, let's assume it can fail
-	return true
+	// Mock verification failure logic
+	return h.RetryCount > 1
 }
 
 func (h *Healer) Loop(issue string) {
 	diagnosis := h.Diagnose(issue)
-	if h.Fix(diagnosis) {
-		if !h.Verify("Fixed") {
-			fmt.Println("Verification failed, triggering rollback.")
-			rollback := NewRollbackHandler(h.Orchestrator)
-			rollback.Execute()
-		} else {
-			fmt.Println("Verification successful.")
+
+	for h.RetryCount < h.RetryLimit {
+		if h.Fix(diagnosis) {
+			if h.Verify("Attempted Fix") {
+				fmt.Println("System healed successfully.")
+				h.Orchestrator.L2.Add(MemoryEntry{
+					ID:        fmt.Sprintf("fix-success-%d", time.Now().Unix()),
+					Content:   fmt.Sprintf("Resolved issue: %s", issue),
+					Timestamp: time.Now(),
+					Tags:      []string{"healer", "resolution"},
+				})
+				return
+			}
+			fmt.Println("Verification failed, retrying...")
 		}
 	}
+
+	fmt.Println("Retry limit reached, triggering mandatory rollback.")
+	rollback := NewRollbackHandler(h.Orchestrator)
+	rollback.Execute()
 }

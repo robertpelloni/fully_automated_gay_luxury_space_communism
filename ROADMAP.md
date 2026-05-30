@@ -1,6 +1,6 @@
 # Roadmap: AI Hustle Machine
 
-_Last updated: 2026-05-30, version 1.0.0-alpha.8_
+_Last updated: 2026-05-30, version 1.0.0-alpha.9_
 
 ## Status legend
 
@@ -8,6 +8,19 @@ _Last updated: 2026-05-30, version 1.0.0-alpha.8_
 - **Beta** — Usable, still evolving
 - **Experimental** — Active R&D, not dependable
 - **Vision** — Directional only
+
+## Completed (v1.0.0-alpha.9)
+
+### 1. Functional Healer Loop
+- **State-Aware**: Tracks diagnosis and resolution in memory.
+- **Retry Policy**: Implemented retry limits with mandatory rollback trigger.
+
+### 2. Semantic Search Bridge
+- **Keyword Search**: Enhanced memory Search with filtering.
+- **Vector Preparation**: Added Vector placeholder to `MemoryEntry`.
+
+### 3. Social Media Module
+- **Scaffolding**: Initial module for automated social media scheduling.
 
 ## Completed (v1.0.0-alpha.8)
 
@@ -76,9 +89,9 @@ _Last updated: 2026-05-30, version 1.0.0-alpha.8_
 - [ ] Integrate `sqlite-vec` for hyper-fast, local-first context matching.
 - [ ] Implement `hustle://` protocol handlers for deep-linking.
 
-### B. Money Machine: Research Hustle (EXPERIMENTAL)
-- [ ] Implement real web search integration (API calls).
-- [ ] Implement PDF export using a Go library (e.g., gofpdf).
+### B. Money Machine: Social Media (EXPERIMENTAL)
+- [ ] Implement real social media API integrations (Twitter/LinkedIn).
+- [ ] Implement content generation using LLM.
 
 ### C. Agent Connectivity (VISION)
 - [ ] Implement A2A Mesh for cross-host agent collaboration.

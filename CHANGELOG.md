@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.0-alpha.9] - 2026-05-30
+### Added
+- Functional Healer loop with retry logic and memory logging.
+- Memory Search with keyword filtering.
+- Initial Social Media hustle module scaffolding.
+- Placeholder for vector embeddings in MemoryEntry.
+
 ## [1.0.0-alpha.8] - 2026-05-30
 ### Added
 - JSON persistence for tiered memory (`Save`/`Load` methods).
