@@ -4,8 +4,8 @@
 - [ ] Integrate `sqlite-vec` for hyper-fast, local-first context matching.
 - [ ] Implement real social media API integrations (Twitter/LinkedIn stubs).
 - [ ] Implement real web search integration (API calls).
-- [ ] Implement PDF export using a Go library.
-- [ ] Add real LLM provider (e.g., Anthropic Claude API).
+- [ ] Integrate actual PDF library (gofpdf).
+- [ ] Complete Anthropic API client logic in `orchestrator/llm.go`.
 
 ## Future Tasks
 - [ ] Implement A2A Mesh for cross-host collaboration.

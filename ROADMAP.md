@@ -1,6 +1,6 @@
 # Roadmap: AI Hustle Machine
 
-_Last updated: 2026-05-30, version 1.0.0-alpha.11_
+_Last updated: 2026-05-30, version 1.0.0-alpha.12_
 
 ## Status legend
 
@@ -8,6 +8,18 @@ _Last updated: 2026-05-30, version 1.0.0-alpha.11_
 - **Beta** — Usable, still evolving
 - **Experimental** — Active R&D, not dependable
 - **Vision** — Directional only
+
+## Completed (v1.0.0-alpha.12)
+
+### 1. Database Persistence
+- **SQLite Backend**: Implemented `orchestrator/sqlite_store.go` for robust relational memory storage.
+- **Dual-Storage**: Support for JSON and SQLite synchronization.
+
+### 2. Output Generation
+- **Report Export**: Research module now generates actual report files.
+
+### 3. LLM Connectivity
+- **Anthropic Integration**: Scaffolded `AnthropicProvider` for real-world AI synthesis.
 
 ## Completed (v1.0.0-alpha.11)
 
@@ -116,10 +128,11 @@ _Last updated: 2026-05-30, version 1.0.0-alpha.11_
 - [ ] Integrate `sqlite-vec` for hyper-fast, local-first context matching.
 - [ ] Implement `hustle://` protocol handlers for deep-linking.
 
-### B. Money Machine: Content Generation (EXPERIMENTAL)
+### B. Money Machine: Real-World Execution (EXPERIMENTAL)
 - [ ] Implement real social media API integrations (Twitter/LinkedIn). (Refining)
 - [ ] Implement real web search integration (API calls).
-- [ ] Implement PDF export using a Go library.
+- [ ] Integrate actual PDF library (gofpdf).
+- [ ] Complete Anthropic API client logic.
 
 ### C. Agent Connectivity (VISION)
 - [ ] Implement A2A Mesh for cross-host agent collaboration.

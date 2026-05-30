@@ -15,17 +15,16 @@ type MemoryEntry struct {
 	BaseScore float64   `json:"base_score"`
 	Timestamp time.Time `json:"timestamp"`
 	Tags      []string  `json:"tags"`
-	Vector    []float32 `json:"vector,omitempty"` // Placeholder for semantic embeddings
+	Vector    []float32 `json:"vector,omitempty"`
 }
 
 // Score calculates the current "heat" of the memory with temporal decay
 func (e MemoryEntry) Score() float64 {
 	elapsed := time.Since(e.Timestamp).Hours()
-	// Simple exponential decay: Score = BaseScore * e^(-0.1 * hours)
 	return e.BaseScore * math.Exp(-0.1*elapsed)
 }
 
-// L1Memory (Scratchpad) - Current session context
+// L1Memory (Scratchpad)
 type L1Memory struct {
 	Entries []MemoryEntry `json:"entries"`
 }
@@ -44,7 +43,7 @@ func (m *L1Memory) Search(query string) []MemoryEntry {
 	return results
 }
 
-// L2Memory (Vault) - Long-term historical patterns
+// L2Memory (Vault)
 type L2Memory struct {
 	Entries []MemoryEntry `json:"entries"`
 }
@@ -63,7 +62,7 @@ func (m *L2Memory) Search(query string) []MemoryEntry {
 	return results
 }
 
-// L3Memory (Archive) - Archived decisions and cold storage
+// L3Memory (Archive)
 type L3Memory struct {
 	Entries []MemoryEntry `json:"entries"`
 }
@@ -84,11 +83,12 @@ func (m *L3Memory) Search(query string) []MemoryEntry {
 
 // Orchestrator handles tiered memory orchestration, financial tracking, and LLM access
 type Orchestrator struct {
-	L1     L1Memory    `json:"l1"`
-	L2     L2Memory    `json:"l2"`
-	L3     L3Memory    `json:"l3"`
-	Ledger Ledger      `json:"ledger"`
-	LLM    LLMProvider `json:"-"` // Don't persist provider
+	L1     L1Memory     `json:"l1"`
+	L2     L2Memory     `json:"l2"`
+	L3     L3Memory     `json:"l3"`
+	Ledger Ledger       `json:"ledger"`
+	LLM    LLMProvider  `json:"-"`
+	DB     *SQLiteStore `json:"-"`
 }
 
 func NewOrchestrator() *Orchestrator {
@@ -102,6 +102,13 @@ func NewOrchestrator() *Orchestrator {
 }
 
 func (o *Orchestrator) Save(filepath string) error {
+	if o.DB != nil {
+		// Sync to SQLite if DB is connected
+		for _, e := range o.L1.Entries { o.DB.SaveMemory("L1", e) }
+		for _, e := range o.L2.Entries { o.DB.SaveMemory("L2", e) }
+		for _, e := range o.L3.Entries { o.DB.SaveMemory("L3", e) }
+	}
+
 	data, err := json.MarshalIndent(o, "", "  ")
 	if err != nil {
 		return err
@@ -111,7 +118,7 @@ func (o *Orchestrator) Save(filepath string) error {
 
 func (o *Orchestrator) Load(filepath string) error {
 	if _, err := os.Stat(filepath); os.IsNotExist(err) {
-		return nil // No file yet, which is fine
+		return nil
 	}
 	data, err := os.ReadFile(filepath)
 	if err != nil {

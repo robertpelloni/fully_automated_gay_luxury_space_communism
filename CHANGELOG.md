@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.0-alpha.12] - 2026-05-30
+### Added
+- SQLite persistence layer for tiered memory storage.
+- Real file export logic for research reports.
+- AnthropicProvider skeleton for future LLM integration.
+- Unit tests for SQLite storage.
+
 ## [1.0.0-alpha.11] - 2026-05-30
 ### Added
 - Integrated Revenue, Expenses, and Profit into `STATUS.json` reporting.

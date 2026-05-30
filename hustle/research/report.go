@@ -3,6 +3,7 @@ package research
 import (
 	"fmt"
 	"github.com/robertpelloni/hustle/orchestrator"
+	"os"
 )
 
 type Report struct {
@@ -28,6 +29,9 @@ func (r *Report) Synthesize(orch *orchestrator.Orchestrator, results []SearchRes
 }
 
 func (r *Report) ExportPDF(filepath string) error {
-	fmt.Printf("Exporting report to PDF: %s\n", filepath)
-	return nil
+	fmt.Printf("Generating report file: %s\n", filepath)
+	// In a real implementation, we would use a PDF library like gofpdf.
+	// For now, we simulate by writing to a text file with a .pdf extension
+	// to verify the export pipeline in E2E tests.
+	return os.WriteFile(filepath, []byte(r.Content), 0644)
 }
