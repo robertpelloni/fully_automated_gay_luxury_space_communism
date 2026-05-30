@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.0.0-alpha.16] - 2026-05-30
+### Added
+- LLM Waterfall implementation for automatic provider failover.
+- Enhanced AnthropicProvider with API data structures.
+
 ## [1.0.0-alpha.15] - 2026-05-30
 ### Added
 - Weighted voting system for the Multi-Agent Council.
@@ -19,7 +24,7 @@
 
 ## [1.0.0-alpha.12] - 2026-05-30
 ### Added
-- SQLite persistence layer for tiered memory.
+- SQLite persistence layer for tiered memory storage.
 - Real file export logic for research reports.
 - AnthropicProvider skeleton.
 

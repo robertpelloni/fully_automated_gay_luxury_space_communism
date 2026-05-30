@@ -5,7 +5,8 @@
 - [ ] Implement real social media API integrations (Twitter/LinkedIn stubs).
 - [ ] Implement real web search integration (API calls to Tavily).
 - [ ] Integrate actual PDF library (gofpdf).
-- [ ] Implement multi-provider LLM failover logic.
+- [ ] Multi-provider LLM failover logic (WaterfallLLM). (Completed)
+- [ ] Complete Anthropic API client logic in `orchestrator/llm.go`.
 
 ## Future Tasks
 - [ ] Implement A2A Mesh for cross-host collaboration.

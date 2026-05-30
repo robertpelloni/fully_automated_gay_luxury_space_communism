@@ -44,7 +44,6 @@ func (m *L1Memory) Search(query string) []MemoryEntry {
 	return results
 }
 
-// RankedSearch sorts by combined relevance and temporal heat
 func (m *L1Memory) RankedSearch(query string) []MemoryEntry {
 	results := m.Search(query)
 	sort.Slice(results, func(i, j int) bool {
@@ -118,12 +117,20 @@ type Orchestrator struct {
 }
 
 func NewOrchestrator() *Orchestrator {
+	// Initialize with LLM Waterfall for failover support
+	waterfall := &WaterfallLLM{
+		Providers: []LLMProvider{
+			&MockLLM{Response: "Primary Success"},
+			&MockLLM{Response: "Secondary Failover"},
+		},
+	}
+
 	return &Orchestrator{
 		L1:     L1Memory{Entries: make([]MemoryEntry, 0)},
 		L2:     L2Memory{Entries: make([]MemoryEntry, 0)},
 		L3:     L3Memory{Entries: make([]MemoryEntry, 0)},
 		Ledger: Ledger{Transactions: make([]Transaction, 0)},
-		LLM:    &MockLLM{},
+		LLM:    waterfall,
 	}
 }
 
