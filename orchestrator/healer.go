@@ -24,12 +24,19 @@ func (h *Healer) Fix(diagnosis string) bool {
 
 func (h *Healer) Verify(fix string) bool {
 	fmt.Printf("Verifying fix: %s\n", fix)
+	// For demonstration, let's assume it can fail
 	return true
 }
 
 func (h *Healer) Loop(issue string) {
 	diagnosis := h.Diagnose(issue)
 	if h.Fix(diagnosis) {
-		h.Verify("Fixed")
+		if !h.Verify("Fixed") {
+			fmt.Println("Verification failed, triggering rollback.")
+			rollback := NewRollbackHandler(h.Orchestrator)
+			rollback.Execute()
+		} else {
+			fmt.Println("Verification successful.")
+		}
 	}
 }

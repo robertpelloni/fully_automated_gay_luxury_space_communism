@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.0.0-alpha.3] - 2026-05-29
+### Added
+- Automated rollback handling in `orchestrator/rollback.go`.
+- Real-time status reporting to `STATUS.json` via `orchestrator/status.go`.
+- Integration of rollback into the `Healer` loop.
+
 ## [1.0.0-alpha.2] - 2026-05-29
 ### Added
 - Repository synchronization orchestration scripts (`sync.sh`, `build.sh`).

@@ -19,3 +19,12 @@ func TestMergeConflictHandling(t *testing.T) {
 		t.Log("Successfully detected mock merge conflict")
 	}
 }
+
+func TestRollback(t *testing.T) {
+	orch := NewOrchestrator()
+	rollback := NewRollbackHandler(orch)
+	err := rollback.Execute()
+	if err != nil {
+		t.Errorf("Rollback execution failed: %v", err)
+	}
+}

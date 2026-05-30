@@ -1,6 +1,6 @@
 # Roadmap: AI Hustle Machine
 
-_Last updated: 2026-05-29, version 1.0.0-alpha.2_
+_Last updated: 2026-05-29, version 1.0.0-alpha.3_
 
 ## Status legend
 
@@ -8,6 +8,12 @@ _Last updated: 2026-05-29, version 1.0.0-alpha.2_
 - **Beta** — Usable, still evolving
 - **Experimental** — Active R&D, not dependable
 - **Vision** — Directional only
+
+## Completed (v1.0.0-alpha.3)
+
+### 1. Robustness & Reporting
+- **Rollback**: Automated state restoration on failure.
+- **Reporting**: Real-time `STATUS.json` updates.
 
 ## Completed (v1.0.0-alpha.2)
 
