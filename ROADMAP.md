@@ -1,6 +1,6 @@
 # Roadmap: AI Hustle Machine
 
-_Last updated: 2026-05-30, version 1.0.0-alpha.17_
+_Last updated: 2026-05-30, version 1.0.0-alpha.15_
 
 ## Status legend
 
@@ -8,18 +8,6 @@ _Last updated: 2026-05-30, version 1.0.0-alpha.17_
 - **Beta** — Usable, still evolving
 - **Experimental** — Active R&D, not dependable
 - **Vision** — Directional only
-
-## Completed (v1.0.0-alpha.17)
-
-### 1. External Connectivity
-- **Anthropic API**: Implemented real HTTP client for Claude 3.5 Sonnet integration.
-- **Tavily API**: Implemented real HTTP client for deep web research.
-
-## Completed (v1.0.0-alpha.16)
-
-### 1. Robust AI Infrastructure
-- **LLM Failover**: Implemented `WaterfallLLM` for automatic provider failover.
-- **Provider Refinement**: Enhanced Anthropic provider scaffolding with API request structures.
 
 ## Completed (v1.0.0-alpha.15)
 
@@ -166,11 +154,12 @@ _Last updated: 2026-05-30, version 1.0.0-alpha.17_
 ### A. Core Orchestration (EXPERIMENTAL)
 - [ ] Integrate `sqlite-vec` for hyper-fast, local-first context matching.
 - [ ] Implement `hustle://` protocol handlers for deep-linking.
-- [ ] Implement real social media API integrations (Twitter/LinkedIn).
+- [ ] Implement multi-provider LLM failover.
 
 ### B. Money Machine: Content Generation (EXPERIMENTAL)
+- [ ] Implement real social media API integrations (Twitter/LinkedIn). (Refining)
+- [ ] Implement real web search integration (API calls).
 - [ ] Integrate actual PDF library (gofpdf).
-- [ ] Automate daily hustle scheduling.
 
 ### C. Agent Connectivity (VISION)
 - [ ] Implement A2A Mesh for cross-host agent collaboration.

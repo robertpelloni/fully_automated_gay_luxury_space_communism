@@ -11,7 +11,8 @@ func TestResearchPipelineE2E(t *testing.T) {
 	orch.LLM = &orchestrator.MockLLM{Response: "The AI agent market is expanding rapidly."}
 
 	// 1. Multi-Provider Search with Orchestrator Integration
-	searcher := &MockSearch{
+	searcher := &ResearchSearch{
+		ActiveProvider: Tavily,
 		Orchestrator:   orch,
 	}
 	results, err := searcher.Query("Advanced automated trading strategies")
