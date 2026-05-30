@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.0-alpha.4] - 2026-05-29
+### Added
+- Enhanced `sync.sh` with "Executive Protocol" reconciliation logic.
+- Real git status and submodule monitoring in `orchestrator/sync_monitor.go`.
+- Comprehensive documentation updates for `VISION.md`, `DEPLOY.md`, and `IDEAS.md`.
+- Expanded unit tests in `orchestrator/sync_test.go`.
+
 ## [1.0.0-alpha.3] - 2026-05-29
 ### Added
 - Automated rollback handling in `orchestrator/rollback.go`.

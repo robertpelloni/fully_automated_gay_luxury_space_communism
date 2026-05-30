@@ -1,6 +1,6 @@
 # Roadmap: AI Hustle Machine
 
-_Last updated: 2026-05-29, version 1.0.0-alpha.3_
+_Last updated: 2026-05-29, version 1.0.0-alpha.4_
 
 ## Status legend
 
@@ -8,6 +8,13 @@ _Last updated: 2026-05-29, version 1.0.0-alpha.3_
 - **Beta** — Usable, still evolving
 - **Experimental** — Active R&D, not dependable
 - **Vision** — Directional only
+
+## Completed (v1.0.0-alpha.4)
+
+### 1. Robust Sync & Docs
+- **Executive Protocol**: Enhanced `sync.sh` with branch reconciliation.
+- **Monitoring**: Real git status and submodule checking in `sync_monitor.go`.
+- **Governance**: Updated VISION, DEPLOY, and IDEAS documents.
 
 ## Completed (v1.0.0-alpha.3)
 
