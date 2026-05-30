@@ -3,9 +3,6 @@ set -e
 
 echo "=== EXECUTIVE PROTOCOL: REPOSITORY SYNC ==="
 
-# Failure handler
-trap 'echo "ERROR: Sync failed. Aborting merge and restoring state..."; git merge --abort 2>/dev/null || true; exit 1' ERR
-
 # 1. Fetch all
 echo "Fetching all remotes and tags..."
 git fetch --all --tags
@@ -21,8 +18,12 @@ echo "Current branch: $CURRENT_BRANCH"
 # Forward Merge: Features to Main
 if [ "$CURRENT_BRANCH" != "main" ]; then
     echo "Attempting to merge main into $CURRENT_BRANCH (Reverse Merge)..."
-    git merge origin/main --no-edit
+    git merge origin/main --no-edit || (echo "Merge conflict in reverse merge, please resolve manually" && exit 1)
 fi
+
+# Reverse Merge: Main into features (This script assumes we are on a feature branch usually)
+# In a real "Executive Protocol", we might iterate through all local branches.
+# For now, we ensure the current branch is caught up with main.
 
 echo "Reconciliation complete."
 echo "Sync successful."
