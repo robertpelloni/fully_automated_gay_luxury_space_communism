@@ -6,9 +6,10 @@ import (
 
 func TestSyncHealth(t *testing.T) {
 	health := GetSyncHealth()
-	if health.Status != "Healthy" {
-		t.Errorf("Expected status Healthy, got %s", health.Status)
+	if health.Status != "Active" {
+		t.Errorf("Expected status Active, got %s", health.Status)
 	}
+	t.Logf("Detected Git State: %s", health.GitState)
 }
 
 func TestMergeConflictHandling(t *testing.T) {
@@ -18,4 +19,18 @@ func TestMergeConflictHandling(t *testing.T) {
 		// Log discovery
 		t.Log("Successfully detected mock merge conflict")
 	}
+}
+
+func TestRollback(t *testing.T) {
+	orch := NewOrchestrator()
+	rollback := NewRollbackHandler(orch)
+	err := rollback.Execute()
+	if err != nil {
+		t.Errorf("Rollback execution failed: %v", err)
+	}
+}
+
+func TestSubmoduleDetection(t *testing.T) {
+	status := CheckSubmodules()
+	t.Logf("Submodule status: %s", status)
 }

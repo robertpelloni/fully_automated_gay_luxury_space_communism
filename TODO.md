@@ -1,9 +1,10 @@
 # Todo List
 
 ## Immediate Tasks
-- [ ] Implement utility-based scoring and temporal decay for all memories.
 - [ ] Integrate `sqlite-vec` for hyper-fast, local-first context matching.
-- [ ] Wire the Research hustle module to the Orchestrator's memory and orchestration pipeline.
+- [ ] Implement real social media API integrations (Twitter/LinkedIn).
+- [ ] Daily hustle task scheduler in Orchestrator.
+- [ ] Implement rate-limiting logic for API clients.
 
 ## Future Tasks
 - [ ] Implement A2A Mesh for cross-host collaboration.
