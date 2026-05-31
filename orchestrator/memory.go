@@ -45,8 +45,12 @@ func (m *L1Memory) Search(query string) []MemoryEntry {
 }
 
 // RankedSearch sorts by combined relevance and temporal heat
-func (m *L1Memory) RankedSearch(query string) []MemoryEntry {
+func (m *L1Memory) RankedSearch(query string, embedder EmbeddingProvider) []MemoryEntry {
 	results := m.Search(query)
+
+	// If vector search is possible, we would re-rank here.
+	// For now, we stick to temporal decay and keyword match.
+
 	sort.Slice(results, func(i, j int) bool {
 		return results[i].Score() > results[j].Score()
 	})
@@ -72,7 +76,7 @@ func (m *L2Memory) Search(query string) []MemoryEntry {
 	return results
 }
 
-func (m *L2Memory) RankedSearch(query string) []MemoryEntry {
+func (m *L2Memory) RankedSearch(query string, embedder EmbeddingProvider) []MemoryEntry {
 	results := m.Search(query)
 	sort.Slice(results, func(i, j int) bool {
 		return results[i].Score() > results[j].Score()
@@ -99,7 +103,7 @@ func (m *L3Memory) Search(query string) []MemoryEntry {
 	return results
 }
 
-func (m *L3Memory) RankedSearch(query string) []MemoryEntry {
+func (m *L3Memory) RankedSearch(query string, embedder EmbeddingProvider) []MemoryEntry {
 	results := m.Search(query)
 	sort.Slice(results, func(i, j int) bool {
 		return results[i].Score() > results[j].Score()
@@ -109,21 +113,23 @@ func (m *L3Memory) RankedSearch(query string) []MemoryEntry {
 
 // Orchestrator handles tiered memory orchestration, financial tracking, and LLM access
 type Orchestrator struct {
-	L1     L1Memory     `json:"l1"`
-	L2     L2Memory     `json:"l2"`
-	L3     L3Memory     `json:"l3"`
-	Ledger Ledger       `json:"ledger"`
-	LLM    LLMProvider  `json:"-"`
-	DB     *SQLiteStore `json:"-"`
+	L1        L1Memory          `json:"l1"`
+	L2        L2Memory          `json:"l2"`
+	L3        L3Memory          `json:"l3"`
+	Ledger    Ledger            `json:"ledger"`
+	LLM       LLMProvider       `json:"-"`
+	Embedder  EmbeddingProvider `json:"-"`
+	DB        *SQLiteStore      `json:"-"`
 }
 
 func NewOrchestrator() *Orchestrator {
 	return &Orchestrator{
-		L1:     L1Memory{Entries: make([]MemoryEntry, 0)},
-		L2:     L2Memory{Entries: make([]MemoryEntry, 0)},
-		L3:     L3Memory{Entries: make([]MemoryEntry, 0)},
-		Ledger: Ledger{Transactions: make([]Transaction, 0)},
-		LLM:    &MockLLM{},
+		L1:       L1Memory{Entries: make([]MemoryEntry, 0)},
+		L2:       L2Memory{Entries: make([]MemoryEntry, 0)},
+		L3:       L3Memory{Entries: make([]MemoryEntry, 0)},
+		Ledger:   Ledger{Transactions: make([]Transaction, 0)},
+		LLM:      &MockLLM{},
+		Embedder: &MockEmbedder{},
 	}
 }
 
