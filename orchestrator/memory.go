@@ -36,8 +36,18 @@ func (m *L1Memory) Add(entry MemoryEntry) {
 
 func (m *L1Memory) Search(query string) []MemoryEntry {
 	var results []MemoryEntry
+	query = strings.ToLower(query)
 	for _, entry := range m.Entries {
-		if strings.Contains(strings.ToLower(entry.Content), strings.ToLower(query)) {
+		match := strings.Contains(strings.ToLower(entry.Content), query)
+		if !match {
+			for _, tag := range entry.Tags {
+				if strings.Contains(strings.ToLower(tag), query) {
+					match = true
+					break
+				}
+			}
+		}
+		if match {
 			results = append(results, entry)
 		}
 	}
@@ -47,10 +57,6 @@ func (m *L1Memory) Search(query string) []MemoryEntry {
 // RankedSearch sorts by combined relevance and temporal heat
 func (m *L1Memory) RankedSearch(query string, embedder EmbeddingProvider) []MemoryEntry {
 	results := m.Search(query)
-
-	// If vector search is possible, we would re-rank here.
-	// For now, we stick to temporal decay and keyword match.
-
 	sort.Slice(results, func(i, j int) bool {
 		return results[i].Score() > results[j].Score()
 	})
@@ -68,8 +74,18 @@ func (m *L2Memory) Add(entry MemoryEntry) {
 
 func (m *L2Memory) Search(query string) []MemoryEntry {
 	var results []MemoryEntry
+	query = strings.ToLower(query)
 	for _, entry := range m.Entries {
-		if strings.Contains(strings.ToLower(entry.Content), strings.ToLower(query)) {
+		match := strings.Contains(strings.ToLower(entry.Content), query)
+		if !match {
+			for _, tag := range entry.Tags {
+				if strings.Contains(strings.ToLower(tag), query) {
+					match = true
+					break
+				}
+			}
+		}
+		if match {
 			results = append(results, entry)
 		}
 	}
@@ -95,8 +111,18 @@ func (m *L3Memory) Add(entry MemoryEntry) {
 
 func (m *L3Memory) Search(query string) []MemoryEntry {
 	var results []MemoryEntry
+	query = strings.ToLower(query)
 	for _, entry := range m.Entries {
-		if strings.Contains(strings.ToLower(entry.Content), strings.ToLower(query)) {
+		match := strings.Contains(strings.ToLower(entry.Content), query)
+		if !match {
+			for _, tag := range entry.Tags {
+				if strings.Contains(strings.ToLower(tag), query) {
+					match = true
+					break
+				}
+			}
+		}
+		if match {
 			results = append(results, entry)
 		}
 	}
