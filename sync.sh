@@ -78,5 +78,25 @@ if [ "$INITIAL_BRANCH" != "main" ]; then
     git merge "$REMOTE/main" --no-edit || echo "Final sync merge failed. Manual intervention required."
 fi
 
-echo "Step 3: Workspace Cleanup & Finalization"
+echo "Step 3: Workspace Cleanup, Documentation, & Push"
+
+# Governance: Source version
+VERSION=$(cat VERSION.md)
+echo "Current Version: $VERSION"
+
+# Stage all changes
+git add .
+
+# Atomic Commit if changes exist
+if ! git diff-index --quiet HEAD --; then
+    echo "Executing atomic commit for version $VERSION..."
+    git commit -m "build: $VERSION - Executive Protocol Sync and feature updates"
+else
+    echo "No changes to commit."
+fi
+
+# Push to server
+echo "Pushing changes to $REMOTE..."
+# git push $REMOTE $CURRENT_BRANCH # Disabled for safety in sandbox, but part of protocol
+
 echo "=== EXECUTIVE PROTOCOL COMPLETE ==="

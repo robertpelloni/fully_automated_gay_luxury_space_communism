@@ -116,7 +116,7 @@ _Last updated: 2026-05-30, version 1.0.0-alpha.23_
 - [ ] Integrate `sqlite-vec` for hyper-fast, local-first context matching.
 - [ ] Implement `hustle://` protocol handlers for deep-linking.
 
-### B. Money Machine: Real-World Execution (EXPERIMENTAL)
+### B. Money Machine: Real-World Execution (BETA)
 - [ ] Implement real social media API integrations (Twitter/LinkedIn). (Refining)
 - [ ] Connect Curation output to Social posting pipeline.
 

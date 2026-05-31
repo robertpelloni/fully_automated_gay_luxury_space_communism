@@ -1,6 +1,8 @@
 package orchestrator
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"math"
 	"os"
@@ -25,6 +27,13 @@ func (e MemoryEntry) Score() float64 {
 	return e.BaseScore * math.Exp(-0.1*elapsed)
 }
 
+// Checksum returns a unique hash of the entry's state
+func (e MemoryEntry) Checksum() string {
+	h := sha256.New()
+	h.Write([]byte(e.ID + e.Content))
+	return hex.EncodeToString(h.Sum(nil))
+}
+
 // L1Memory (Scratchpad)
 type L1Memory struct {
 	Entries []MemoryEntry `json:"entries"`
@@ -32,6 +41,13 @@ type L1Memory struct {
 
 func (m *L1Memory) Add(entry MemoryEntry) {
 	m.Entries = append(m.Entries, entry)
+}
+
+func (m *L1Memory) Get(id string) (MemoryEntry, bool) {
+	for _, e := range m.Entries {
+		if e.ID == id { return e, true }
+	}
+	return MemoryEntry{}, false
 }
 
 func (m *L1Memory) Search(query string) []MemoryEntry {
@@ -44,7 +60,6 @@ func (m *L1Memory) Search(query string) []MemoryEntry {
 	return results
 }
 
-// RankedSearch sorts by combined relevance and temporal heat
 func (m *L1Memory) RankedSearch(query string, embedder EmbeddingProvider) []MemoryEntry {
 	results := m.Search(query)
 
@@ -57,6 +72,16 @@ func (m *L1Memory) RankedSearch(query string, embedder EmbeddingProvider) []Memo
 	return results
 }
 
+func (m *L1Memory) Checksum() string {
+	var combined string
+	for _, e := range m.Entries {
+		combined += e.Checksum()
+	}
+	h := sha256.New()
+	h.Write([]byte(combined))
+	return hex.EncodeToString(h.Sum(nil))
+}
+
 // L2Memory (Vault)
 type L2Memory struct {
 	Entries []MemoryEntry `json:"entries"`
@@ -64,6 +89,13 @@ type L2Memory struct {
 
 func (m *L2Memory) Add(entry MemoryEntry) {
 	m.Entries = append(m.Entries, entry)
+}
+
+func (m *L2Memory) Get(id string) (MemoryEntry, bool) {
+	for _, e := range m.Entries {
+		if e.ID == id { return e, true }
+	}
+	return MemoryEntry{}, false
 }
 
 func (m *L2Memory) Search(query string) []MemoryEntry {
@@ -84,6 +116,16 @@ func (m *L2Memory) RankedSearch(query string, embedder EmbeddingProvider) []Memo
 	return results
 }
 
+func (m *L2Memory) Checksum() string {
+	var combined string
+	for _, e := range m.Entries {
+		combined += e.Checksum()
+	}
+	h := sha256.New()
+	h.Write([]byte(combined))
+	return hex.EncodeToString(h.Sum(nil))
+}
+
 // L3Memory (Archive)
 type L3Memory struct {
 	Entries []MemoryEntry `json:"entries"`
@@ -91,6 +133,13 @@ type L3Memory struct {
 
 func (m *L3Memory) Add(entry MemoryEntry) {
 	m.Entries = append(m.Entries, entry)
+}
+
+func (m *L3Memory) Get(id string) (MemoryEntry, bool) {
+	for _, e := range m.Entries {
+		if e.ID == id { return e, true }
+	}
+	return MemoryEntry{}, false
 }
 
 func (m *L3Memory) Search(query string) []MemoryEntry {
@@ -109,6 +158,16 @@ func (m *L3Memory) RankedSearch(query string, embedder EmbeddingProvider) []Memo
 		return results[i].Score() > results[j].Score()
 	})
 	return results
+}
+
+func (m *L3Memory) Checksum() string {
+	var combined string
+	for _, e := range m.Entries {
+		combined += e.Checksum()
+	}
+	h := sha256.New()
+	h.Write([]byte(combined))
+	return hex.EncodeToString(h.Sum(nil))
 }
 
 // Orchestrator handles tiered memory orchestration, financial tracking, and LLM access
