@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.0-alpha.25] - 2026-05-30
+### Added
+- **Curation Chain (BETA)**: Implemented automated pipeline connecting content curation to social media posting.
+- **Functional Vector Search**: Integrated Go-level cosine similarity for semantic memory retrieval in `SQLiteStore`.
+- **Chain Orchestration**: Added "chain" hustle type and interactive menu option for executing full multi-module workflows.
+- **Scheduler Evolution**: Transitioned from individual hustle tasks to complex "CurationChain" scheduling.
+
 ## [1.0.0-alpha.24] - 2026-05-30
 ### Added
 - **Social Media API Scaffolding (BETA)**: Implemented real-world API structures for Twitter and LinkedIn posting.

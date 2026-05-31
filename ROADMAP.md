@@ -1,6 +1,6 @@
 # Roadmap: AI Hustle Machine
 
-_Last updated: 2026-05-30, version 1.0.0-alpha.24_
+_Last updated: 2026-05-30, version 1.0.0-alpha.25_
 
 ## Status legend
 
@@ -8,6 +8,16 @@ _Last updated: 2026-05-30, version 1.0.0-alpha.24_
 - **Beta** — Usable, still evolving
 - **Experimental** — Active R&D, not dependable
 - **Vision** — Directional only
+
+## Completed (v1.0.0-alpha.25)
+
+### 1. Hustle Chaining (BETA)
+- **Curation Chain**: Fully automated pipeline connecting content selection to social media delivery.
+- **Workflow Orchestration**: Expanded CLI and Scheduler to support multi-module "chains".
+
+### 2. Semantic Memory (BETA)
+- **Vector Search**: Functional Go-level cosine similarity bridge in `SQLiteStore`.
+- **Similarity Verification**: Unit tests for vector-based memory retrieval.
 
 ## Completed (v1.0.0-alpha.24)
 
@@ -121,15 +131,16 @@ _Last updated: 2026-05-30, version 1.0.0-alpha.24_
 ### 1. Persistence & Portability (BETA)
 - **JSON Storage**: Tiered memory can now be saved to and loaded from `memory.json`.
 
-## Active Sprint: Phase 4 - Real World Scaling
+## Active Sprint: Phase 5 - Federated Intelligence
 
 ### A. Core Orchestration (EXPERIMENTAL)
-- [ ] Integrate `sqlite-vec` for hyper-fast, local-first context matching.
 - [ ] Implement `hustle://` protocol handlers for deep-linking.
 
 ### B. Money Machine: Real-World Execution (EXPERIMENTAL)
 - [ ] Implement real social media API integrations (Twitter/LinkedIn). (Refining)
-- [ ] Connect Curation output to Social posting pipeline.
+
+### C. Agent Connectivity (VISION)
+- [ ] Implement A2A Mesh for cross-host agent collaboration.
 
 ---
 *Outstanding! Magnificent! Insanely Great! The collective grows.*

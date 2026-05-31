@@ -14,7 +14,7 @@ import (
 )
 
 func main() {
-	hustleTask := flag.String("hustle", "", "Run a specific hustle module (research, social, curation)")
+	hustleTask := flag.String("hustle", "", "Run a specific hustle module (research, social, curation, chain)")
 	syncMode := flag.Bool("sync", false, "Run repository synchronization protocol")
 	params := flag.String("params", "{}", "JSON parameters for the hustle module")
 	dashboard := flag.Bool("dashboard", false, "Start the live terminal dashboard")
@@ -53,13 +53,8 @@ func main() {
 			return err
 		})
 
-		scheduler.Register("Curation", 2*time.Hour, func(o *orchestrator.Orchestrator) error {
-			c := &curation.CurationModule{
-				Orchestrator: o,
-				Fetcher:      curation.NewRSSFetcher(),
-				Feeds:        []string{"https://news.ycombinator.com/rss"},
-			}
-			return c.Curate("Technology")
+		scheduler.Register("CurationChain", 2*time.Hour, func(o *orchestrator.Orchestrator) error {
+			return runCurationChain(o)
 		})
 
 		scheduler.Register("Heartbeat", 5*time.Minute, func(o *orchestrator.Orchestrator) error {
@@ -103,9 +98,42 @@ func launchHustle(orch *orchestrator.Orchestrator, task string) {
 	case "social":
 		provider := social.NewTwitterProvider()
 		social.SchedulePost(orch, provider, "Twitter", "AI")
+	case "chain":
+		runCurationChain(orch)
 	default:
 		fmt.Printf("Unknown hustle: %s\n", task)
 	}
+}
+
+func runCurationChain(orch *orchestrator.Orchestrator) error {
+	fmt.Println("--- STARTING CURATION CHAIN ---")
+
+	// 1. Curate
+	c := &curation.CurationModule{
+		Orchestrator: orch,
+		Fetcher:      curation.NewRSSFetcher(),
+		Feeds:        []string{"https://news.ycombinator.com/rss"},
+	}
+	err := c.Curate("AI")
+	if err != nil {
+		return fmt.Errorf("curation failed: %v", err)
+	}
+
+	// 2. Fetch last curated blurb from L1 memory
+	memories := orch.L1.Search("curation")
+	if len(memories) == 0 {
+		return fmt.Errorf("no curated content found in memory")
+	}
+	lastCurated := memories[len(memories)-1].Content
+
+	// 3. Post to Social
+	fmt.Println("Forwarding curated blurb to Social module...")
+	provider := social.NewTwitterProvider()
+	// We use the curated content as a basis for the social post
+	social.SchedulePost(orch, provider, "Twitter", "the following curated insight: "+lastCurated)
+
+	fmt.Println("--- CURATION CHAIN COMPLETE ---")
+	return nil
 }
 
 func runInteractiveMenu(orch *orchestrator.Orchestrator, version string) {
@@ -115,8 +143,9 @@ func runInteractiveMenu(orch *orchestrator.Orchestrator, version string) {
 		fmt.Println("1. Launch Research Hustle")
 		fmt.Println("2. Launch Social Hustle")
 		fmt.Println("3. Launch Curation Hustle")
-		fmt.Println("4. View Dashboard")
-		fmt.Println("5. Run Repository Sync")
+		fmt.Println("4. Launch FULL CHAIN (Curate -> Post)")
+		fmt.Println("5. View Dashboard")
+		fmt.Println("6. Run Repository Sync")
 		fmt.Println("q. Quit")
 		fmt.Print("Select an option: ")
 
@@ -131,10 +160,12 @@ func runInteractiveMenu(orch *orchestrator.Orchestrator, version string) {
 		case "3":
 			launchHustle(orch, "curation")
 		case "4":
+			launchHustle(orch, "chain")
+		case "5":
 			orchestrator.ShowDashboard(orch)
 			fmt.Println("\nPress Enter to return to menu...")
 			reader.ReadString('\n')
-		case "5":
+		case "6":
 			fmt.Println("Running Sync Protocol...")
 			// Logic to invoke sync
 		case "q":
