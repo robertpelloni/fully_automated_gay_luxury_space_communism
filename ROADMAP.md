@@ -1,6 +1,6 @@
 # Roadmap: AI Hustle Machine
 
-_Last updated: 2026-05-30, version 1.0.0-alpha.26_
+_Last updated: 2026-05-30, version 1.0.0-alpha.27_
 
 ## Status legend
 
@@ -8,6 +8,12 @@ _Last updated: 2026-05-30, version 1.0.0-alpha.26_
 - **Beta** — Usable, still evolving
 - **Experimental** — Active R&D, not dependable
 - **Vision** — Directional only
+
+## Completed (v1.0.0-alpha.27)
+
+### 1. Federated Foundations (EXPERIMENTAL)
+- **A2A Message Broker**: In-memory message routing system for agent-to-agent collaboration.
+- **Remote Dispatch**: HTTP API layer for triggering hustle protocols from external hosts.
 
 ## Completed (v1.0.0-alpha.26)
 
@@ -127,26 +133,26 @@ _Last updated: 2026-05-30, version 1.0.0-alpha.26_
 ### 1. Financial Intelligence (BETA)
 - **Ledger System**: Implemented `orchestrator/ledger.go` for revenue and expense tracking.
 
-## Completed (v1.0.0-alpha.9)
+## Completed (v1.0.0-alpha.9) - 2026-05-30
+### Added
+- Functional Healer loop with retry logic.
+- Memory Search with keyword filtering.
+- Initial Social Media hustle module scaffolding.
 
-### 1. Functional Healer Loop (BETA)
-- **State-Aware**: Tracks diagnosis and resolution in memory.
-
-## Completed (v1.0.0-alpha.8)
-
-### 1. Persistence & Portability (BETA)
-- **JSON Storage**: Tiered memory can now be saved to and loaded from `memory.json`.
+## Completed (v1.0.0-alpha.8) - 2026-05-30
+### Added
+- JSON persistence for tiered memory.
+- Standalone entry points for Orchestrator and Research modules.
+- Automatic integration between research results and orchestrator memory.
 
 ## Active Sprint: Phase 5 - Federated Intelligence
 
 ### A. Core Orchestration (EXPERIMENTAL)
 - [ ] Implement inter-agent protocol messaging (A2A).
+- [ ] P2P Memory Swarm (Vision).
 
 ### B. Money Machine: Real-World Execution (EXPERIMENTAL)
 - [ ] Implement real social media API integrations (Twitter/LinkedIn). (Refining)
-
-### C. Agent Connectivity (VISION)
-- [ ] Implement A2A Mesh for cross-host agent collaboration.
 
 ---
 *Outstanding! Magnificent! Insanely Great! The collective grows.*

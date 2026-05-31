@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.0-alpha.27] - 2026-05-30
+### Added
+- **A2A Broker (EXPERIMENTAL)**: Implemented the Agent-to-Agent message broker for inter-agent communication.
+- **Mesh Messaging**: Defined `Message` and `MessageType` (Query, Command, Response, Event) structures for federated orchestration.
+- **External Dispatch API**: Exposed the `hustle://` protocol via an HTTP `/dispatch` endpoint for remote task triggering.
+- **CLI API Support**: Added `-api` flag to Orchestrator CLI to launch the message listener.
+
 ## [1.0.0-alpha.26] - 2026-05-30
 ### Added
 - **`hustle://` Protocol Handler (BETA)**: Introduced a URI-based routing system for dispatching hustle tasks.

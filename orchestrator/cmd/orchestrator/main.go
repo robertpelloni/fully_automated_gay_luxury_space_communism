@@ -22,6 +22,7 @@ func main() {
 	dashboard := flag.Bool("dashboard", false, "Start the live terminal dashboard")
 	daemon := flag.Bool("daemon", false, "Run the Orchestrator as a background task scheduler")
 	interactive := flag.Bool("interactive", false, "Launch the interactive command menu")
+	apiPort := flag.String("api", "", "Start the HTTP API on specified port (e.g. 8080)")
 	flag.Parse()
 
 	// Source version from VERSION.md
@@ -70,6 +71,11 @@ func main() {
 	protocol.Register("chain", func(p url.Values) error {
 		return runCurationChain(orch)
 	})
+
+	if *apiPort != "" {
+		api := orchestrator.NewAPI(orch, protocol)
+		go api.Start(*apiPort)
+	}
 
 	if *interactive {
 		runInteractiveMenu(orch, protocol, version)
@@ -121,6 +127,12 @@ func main() {
 		}
 	}
 
+	// If we started API but no other long running mode, we need to wait
+	if *apiPort != "" {
+		fmt.Println("API running. Press Ctrl+C to terminate.")
+		select {}
+	}
+
 	// Real-time status reporting with financial metrics
 	orchestrator.WriteStatusReport(version, "Running", "Orchestrator command processed", orch.Ledger)
 
@@ -152,6 +164,7 @@ func runCurationChain(orch *orchestrator.Orchestrator) error {
 	// 3. Post to Social
 	fmt.Println("Forwarding curated blurb to Social module...")
 	provider := social.NewTwitterProvider()
+	// We use the curated content as a basis for the social post
 	social.SchedulePost(orch, provider, "Twitter", "the following curated insight: "+lastCurated)
 
 	fmt.Println("--- CURATION CHAIN COMPLETE ---")
