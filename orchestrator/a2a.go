@@ -1,7 +1,10 @@
 package orchestrator
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
+	"net/http"
 	"sync"
 	"time"
 )
@@ -28,15 +31,17 @@ type Message struct {
 
 // A2ABroker manages message routing between agents
 type A2ABroker struct {
-	Orchestrator *Orchestrator
-	mu           sync.RWMutex
+	Orchestrator  *Orchestrator
+	mu            sync.RWMutex
 	Subscriptions map[string]chan Message
+	Peers         map[string]string // TargetID -> RemoteURL
 }
 
 func NewA2ABroker(orch *Orchestrator) *A2ABroker {
 	return &A2ABroker{
 		Orchestrator:  orch,
 		Subscriptions: make(map[string]chan Message),
+		Peers:         make(map[string]string),
 	}
 }
 
@@ -50,10 +55,20 @@ func (b *A2ABroker) Subscribe(agentID string) chan Message {
 	return ch
 }
 
-// Route delivers a message to the appropriate target
+// RegisterPeer mapping a target ID to a remote URL
+func (b *A2ABroker) RegisterPeer(targetID, url string) {
+	b.mu.Lock()
+	defer b.mu.Unlock()
+	b.Peers[targetID] = url
+	fmt.Printf("[A2A] Registered remote peer %s at %s\n", targetID, url)
+}
+
+// Route delivers a message to the appropriate target (local or remote)
 func (b *A2ABroker) Route(msg Message) error {
 	b.mu.RLock()
-	defer b.mu.RUnlock()
+	localCh, isLocal := b.Subscriptions[msg.Target]
+	remoteURL, isRemote := b.Peers[msg.Target]
+	b.mu.RUnlock()
 
 	fmt.Printf("[A2A] Routing %s from %s to %s\n", msg.Type, msg.Source, msg.Target)
 
@@ -65,19 +80,42 @@ func (b *A2ABroker) Route(msg Message) error {
 		Tags:      []string{"a2a", msg.Source, msg.Target},
 	})
 
-	if ch, ok := b.Subscriptions[msg.Target]; ok {
+	if isLocal {
 		select {
-		case ch <- msg:
+		case localCh <- msg:
 			return nil
 		case <-time.After(1 * time.Second):
-			return fmt.Errorf("target %s subscription buffer full", msg.Target)
+			return fmt.Errorf("target %s local subscription buffer full", msg.Target)
 		}
 	}
 
-	return fmt.Errorf("target %s not found in mesh", msg.Target)
+	if isRemote {
+		return b.forwardToRemote(remoteURL, msg)
+	}
+
+	return fmt.Errorf("target %s not found in local mesh or known peers", msg.Target)
 }
 
-// Broadcast sends a message to all subscribers
+func (b *A2ABroker) forwardToRemote(url string, msg Message) error {
+	fmt.Printf("[A2A] Forwarding message to remote peer: %s\n", url)
+	data, _ := json.Marshal(msg)
+
+	client := &http.Client{Timeout: 5 * time.Second}
+	// We assume remote has a /message endpoint for A2A
+	resp, err := client.Post(url+"/message", "application/json", bytes.NewBuffer(data))
+	if err != nil {
+		return fmt.Errorf("failed to forward to remote: %v", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("remote peer returned error status: %d", resp.StatusCode)
+	}
+
+	return nil
+}
+
+// Broadcast sends a message to all local subscribers and known peers
 func (b *A2ABroker) Broadcast(msg Message) {
 	b.mu.RLock()
 	defer b.mu.RUnlock()
@@ -89,7 +127,14 @@ func (b *A2ABroker) Broadcast(msg Message) {
 		select {
 		case ch <- msg:
 		default:
-			fmt.Printf("[A2A] Warning: Failed to deliver broadcast to %s\n", id)
+			fmt.Printf("[A2A] Warning: Failed to deliver local broadcast to %s\n", id)
 		}
+	}
+
+	for id, url := range b.Peers {
+		if id == msg.Source {
+			continue
+		}
+		go b.forwardToRemote(url, msg)
 	}
 }

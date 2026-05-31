@@ -7,6 +7,7 @@ import (
 	"github.com/robertpelloni/hustle/hustle/curation"
 	"github.com/robertpelloni/hustle/hustle/research"
 	"github.com/robertpelloni/hustle/hustle/social"
+	"github.com/robertpelloni/hustle/hustle/trading"
 	"github.com/robertpelloni/hustle/orchestrator"
 	"net/url"
 	"os"
@@ -15,7 +16,7 @@ import (
 )
 
 func main() {
-	hustleTask := flag.String("hustle", "", "Run a specific hustle module (research, social, curation, chain)")
+	hustleTask := flag.String("hustle", "", "Run a specific hustle module (research, social, curation, chain, trading)")
 	hustleURI := flag.String("uri", "", "Run a hustle module via hustle:// URI")
 	syncMode := flag.Bool("sync", false, "Run repository synchronization protocol")
 	params := flag.String("params", "{}", "JSON parameters for the hustle module")
@@ -36,6 +37,7 @@ func main() {
 
 	orch := orchestrator.NewOrchestrator()
 	protocol := orchestrator.NewHustleProtocol()
+	broker := orchestrator.NewA2ABroker(orch)
 
 	// Register Handlers
 	protocol.Register("research", func(p url.Values) error {
@@ -68,12 +70,21 @@ func main() {
 		social.SchedulePost(orch, provider, platform, topic)
 		return nil
 	})
+	protocol.Register("trading", func(p url.Values) error {
+		symbol := p.Get("symbol")
+		if symbol == "" { symbol = "BTC" }
+		trader := &trading.TradingModule{
+			Orchestrator: orch,
+			Symbol:       symbol,
+		}
+		return trader.ExecuteStrategy()
+	})
 	protocol.Register("chain", func(p url.Values) error {
 		return runCurationChain(orch)
 	})
 
 	if *apiPort != "" {
-		api := orchestrator.NewAPI(orch, protocol)
+		api := orchestrator.NewAPI(orch, protocol, broker)
 		go api.Start(*apiPort)
 	}
 
@@ -97,6 +108,10 @@ func main() {
 
 		scheduler.Register("CurationChain", 2*time.Hour, func(o *orchestrator.Orchestrator) error {
 			return protocol.HandleURI("hustle://chain")
+		})
+
+		scheduler.Register("Trading", 30*time.Minute, func(o *orchestrator.Orchestrator) error {
+			return protocol.HandleURI("hustle://trading?symbol=BTC")
 		})
 
 		scheduler.Register("Heartbeat", 5*time.Minute, func(o *orchestrator.Orchestrator) error {
@@ -164,7 +179,6 @@ func runCurationChain(orch *orchestrator.Orchestrator) error {
 	// 3. Post to Social
 	fmt.Println("Forwarding curated blurb to Social module...")
 	provider := social.NewTwitterProvider()
-	// We use the curated content as a basis for the social post
 	social.SchedulePost(orch, provider, "Twitter", "the following curated insight: "+lastCurated)
 
 	fmt.Println("--- CURATION CHAIN COMPLETE ---")
@@ -178,9 +192,10 @@ func runInteractiveMenu(orch *orchestrator.Orchestrator, protocol *orchestrator.
 		fmt.Println("1. Launch Research Hustle")
 		fmt.Println("2. Launch Social Hustle")
 		fmt.Println("3. Launch Curation Hustle")
-		fmt.Println("4. Launch FULL CHAIN (Curate -> Post)")
-		fmt.Println("5. View Dashboard")
-		fmt.Println("6. Run Repository Sync")
+		fmt.Println("4. Launch Trading Hustle")
+		fmt.Println("5. Launch FULL CHAIN (Curate -> Post)")
+		fmt.Println("6. View Dashboard")
+		fmt.Println("7. Run Repository Sync")
 		fmt.Println("q. Quit")
 		fmt.Print("Select an option: ")
 
@@ -195,12 +210,14 @@ func runInteractiveMenu(orch *orchestrator.Orchestrator, protocol *orchestrator.
 		case "3":
 			protocol.HandleURI("hustle://curation")
 		case "4":
-			protocol.HandleURI("hustle://chain")
+			protocol.HandleURI("hustle://trading")
 		case "5":
+			protocol.HandleURI("hustle://chain")
+		case "6":
 			orchestrator.ShowDashboard(orch)
 			fmt.Println("\nPress Enter to return to menu...")
 			reader.ReadString('\n')
-		case "6":
+		case "7":
 			fmt.Println("Running Sync Protocol...")
 		case "q":
 			fmt.Println("Exiting...")

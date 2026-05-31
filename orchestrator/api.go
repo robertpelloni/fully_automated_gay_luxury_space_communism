@@ -9,18 +9,22 @@ import (
 type API struct {
 	Orchestrator *Orchestrator
 	Protocol     *HustleProtocol
+	Broker       *A2ABroker
 }
 
-func NewAPI(orch *Orchestrator, protocol *HustleProtocol) *API {
+func NewAPI(orch *Orchestrator, protocol *HustleProtocol, broker *A2ABroker) *API {
 	return &API{
 		Orchestrator: orch,
 		Protocol:     protocol,
+		Broker:       broker,
 	}
 }
 
 func (a *API) Start(port string) error {
 	http.HandleFunc("/dispatch", a.handleDispatch)
 	http.HandleFunc("/status", a.handleStatus)
+	http.HandleFunc("/message", a.handleMessage)
+	http.HandleFunc("/register", a.handleRegister)
 
 	fmt.Printf("[API] Orchestrator listening on port %s\n", port)
 	return http.ListenAndServe(":"+port, nil)
@@ -52,11 +56,55 @@ func (a *API) handleDispatch(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "URI %s dispatched successfully", req.URI)
 }
 
+func (a *API) handleMessage(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Only POST allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	var msg Message
+	if err := json.NewDecoder(r.Body).Decode(&msg); err != nil {
+		http.Error(w, "Invalid Message JSON", http.StatusBadRequest)
+		return
+	}
+
+	fmt.Printf("[API] Received incoming A2A message for target: %s\n", msg.Target)
+
+	if err := a.Broker.Route(msg); err != nil {
+		http.Error(w, fmt.Sprintf("Routing error: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+}
+
+func (a *API) handleRegister(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Only POST allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	var req struct {
+		ID  string `json:"id"`
+		URL string `json:"url"`
+	}
+
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "Invalid JSON", http.StatusBadRequest)
+		return
+	}
+
+	a.Broker.RegisterPeer(req.ID, req.URL)
+	w.WriteHeader(http.StatusOK)
+	fmt.Fprintf(w, "Peer %s registered successfully", req.ID)
+}
+
 func (a *API) handleStatus(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(map[string]interface{}{
 		"status":   "Active",
-		"version":  "v1.0.0-alpha.27",
+		"version":  "v1.0.0-alpha.28",
 		"profit":   a.Orchestrator.Ledger.Profit(),
 		"memories": len(a.Orchestrator.L1.Entries),
+		"peers":    len(a.Broker.Peers),
 	})
 }

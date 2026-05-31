@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.0-alpha.28] - 2026-05-30
+### Added
+- **Remote A2A Forwarding (BETA)**: Implemented cross-host message forwarding in `A2ABroker`.
+- **Peer Discovery API**: Added `/register` endpoint for orchestrators to handshake and form a mesh.
+- **Trading Module (BETA)**: Scaffolded automated trading module with strategy execution and symbol tracking.
+- **Networked Dispatch**: Hardened the HTTP `/message` endpoint for receiving remote A2A traffic.
+
 ## [1.0.0-alpha.27] - 2026-05-30
 ### Added
 - **A2A Broker (EXPERIMENTAL)**: Implemented the Agent-to-Agent message broker for inter-agent communication.
