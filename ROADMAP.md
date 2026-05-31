@@ -1,6 +1,6 @@
 # Roadmap: AI Hustle Machine
 
-_Last updated: 2026-05-30, version 1.0.0-alpha.29_
+_Last updated: 2026-05-30, version 1.0.0-alpha.30_
 
 ## Status legend
 
@@ -8,6 +8,16 @@ _Last updated: 2026-05-30, version 1.0.0-alpha.29_
 - **Beta** — Usable, still evolving
 - **Experimental** — Active R&D, not dependable
 - **Vision** — Directional only
+
+## Completed (v1.0.0-alpha.30)
+
+### 1. Asynchronous Mesh (BETA)
+- **Pub/Sub Messaging**: Implemented NATS-style topics in `A2ABroker` for decoupled event-driven collaboration.
+- **Dynamic Handlers**: Support for registering module-specific handlers to asynchronous events.
+
+### 2. Strategy Refinement (EXPERIMENTAL)
+- **Technical Indicators**: Trading module now supports Simple Moving Average (SMA) and historical price tracking.
+- **Price Governance**: Pluggable `PriceFetcher` interface for multi-source market data.
 
 ## Completed (v1.0.0-alpha.29)
 
@@ -46,57 +56,11 @@ _Last updated: 2026-05-30, version 1.0.0-alpha.29_
 - **Vector Search**: Functional Go-level cosine similarity bridge in `SQLiteStore`.
 - **Similarity Verification**: Unit tests for vector-based memory retrieval.
 
-## Completed (v1.0.0-alpha.24)
-
-### 1. Social Amplification (BETA)
-- **API Connectivity**: Scaffolded functional HTTP clients for Twitter and LinkedIn.
-- **Environment Management**: Support for external API tokens and keys.
-
-### 2. Autonomous Orchestration (BETA)
-- **Interactive Controls**: Full wiring of CLI menu to module execution.
-- **Automated Scheduling**: Daemon mode now proactively executes Research and Curation hustles.
-- **Intelligent Sync**: Forward merge capabilities for streamlined feature integration.
-
-## Completed (v1.0.0-alpha.23)
-
-### 1. Vector Intelligence (EXPERIMENTAL)
-- **Vector Storage**: Added `embedding` BLOB support to `SQLiteStore`.
-- **Embedding Interface**: Defined `EmbeddingProvider` for pluggable vector generation.
-- **Semantic Scaffolding**: Updated tiered memory to support vector-aware `RankedSearch`.
-
-## Completed (v1.0.0-alpha.22)
-
-### 1. External Data Sourcing (BETA)
-- **RSS/Atom Integration**: Functional `FeedFetcher` in `hustle/curation` module using `gofeed`.
-- **Real-world Curation**: Content synthesis now uses live external feed data.
-
-## Completed (v1.0.0-alpha.21)
-
-### 1. Robust Scheduling (BETA)
-- **Task Persistence**: Implemented `SaveState`/`LoadState` in `orchestrator/scheduler.go` to persist task history in `tasks.json`.
-
-## Completed (v1.0.0-alpha.20)
-
-### 1. Autonomous Scheduling (BETA)
-- **Task Scheduler**: Implemented `orchestrator/scheduler.go` for periodic hustle execution.
-- **Daemon Mode**: Added `-daemon` flag to orchestrator CLI for background operation.
-
-## Completed (v1.0.0-alpha.19)
-
-### 1. Professional Output (BETA)
-- **Real PDF Generation**: Integrated `gofpdf` into the research module for legitimate report files.
-
-## Completed (v1.0.0-alpha.18)
-
-### 1. Advanced Git Orchestration (BETA)
-- **Intelligent Merge Engine**: `sync.sh` now iterates and reconciles all local feature branches.
-- **Hardened Rollback**: Implementation of full Git recovery (abort merge/rebase, hard reset, cleanup).
-
 ## Active Sprint: Phase 5 - Federated Intelligence
 
 ### A. Core Orchestration (EXPERIMENTAL)
-- [ ] P2P Memory Swarm (Refining).
 - [ ] Distributed Broker (NATS/P2P Integration).
+- [ ] Merkle-tree based Memory Swarm reconciliation.
 
 ### B. Money Machine: Real-World Execution (EXPERIMENTAL)
 - [ ] Implement real social media API integrations (Twitter/LinkedIn). (Refining)

@@ -78,6 +78,7 @@ func main() {
 		trader := &trading.TradingModule{
 			Orchestrator: orch,
 			Symbol:       symbol,
+			Fetcher:      &trading.MockPriceFetcher{},
 		}
 		return trader.ExecuteStrategy()
 	})

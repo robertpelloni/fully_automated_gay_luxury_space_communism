@@ -39,6 +39,28 @@ func TestA2ABroker(t *testing.T) {
 		t.Fatal("Timed out waiting for message on ch2")
 	}
 
+	// Test Topic Pub/Sub
+	topic := "alerts"
+	chTopic := broker.SubscribeTopic(topic)
+
+	pubMsg := Message{
+		ID:      "pub-1",
+		Source:  agent1,
+		Type:    Event,
+		Topic:   topic,
+		Payload: "New Alpha Found",
+	}
+	broker.Publish(pubMsg)
+
+	select {
+	case received := <-chTopic:
+		if received.Payload != pubMsg.Payload {
+			t.Errorf("Received wrong payload: got %s, want %s", received.Payload, pubMsg.Payload)
+		}
+	case <-time.After(1 * time.Second):
+		t.Fatal("Timed out waiting for topic message")
+	}
+
 	// Test Broadcast
 	broadcastMsg := Message{
 		ID:     "b-1",

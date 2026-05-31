@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.0-alpha.30] - 2026-05-30
+### Added
+- **Asynchronous Mesh (BETA)**: Implemented NATS-style Topic Pub/Sub in `A2ABroker`.
+- **Trading Indicators (EXPERIMENTAL)**: Added Simple Moving Average (SMA) calculation to the Trading module.
+- **Price Sourcing**: Introduced `PriceFetcher` interface for modular price data delivery.
+- **Event-Driven Pub/Sub**: Added `Publish` and `SubscribeTopic` methods for broadcast messaging.
+
 ## [1.0.0-alpha.29] - 2026-05-30
 ### Added
 - **P2P Memory Swarm (EXPERIMENTAL)**: Implemented `MemorySwarm` for federated synchronization of L2/L3 memories across the mesh.
