@@ -14,8 +14,16 @@ if git remote | grep -q "^upstream$"; then
 fi
 echo "Using remote: $REMOTE"
 
+# Detect main branch name (main or master)
+MAIN_BRANCH="main"
+if git branch -r | grep -q "$REMOTE/master"; then
+    MAIN_BRANCH="master"
+fi
+echo "Main branch detected: $MAIN_BRANCH"
+
 echo "Fetching all remotes and tags..."
 git fetch --all --tags
+
 
 echo "Updating submodules recursively to their latest tracking commits..."
 git submodule update --init --recursive
@@ -52,9 +60,9 @@ for BRANCH in $ALL_LOCAL_BRANCHES; do
     fi
 
     # Reverse Merge: Merging main into feature branch
-    echo "Reverse Merge: Merging $REMOTE/main into $BRANCH..."
-    if git merge "$REMOTE/main" --no-edit; then
-        echo "Successfully caught up $BRANCH with $REMOTE/main."
+    echo "Reverse Merge: Merging $REMOTE/$MAIN_BRANCH into $BRANCH..."
+    if git merge "$REMOTE/$MAIN_BRANCH" --no-edit; then
+        echo "Successfully caught up $BRANCH with $REMOTE/$MAIN_BRANCH."
     else
         echo "CONFLICT detected on $BRANCH. Aborting reverse merge."
         git merge --abort
@@ -64,10 +72,10 @@ for BRANCH in $ALL_LOCAL_BRANCHES; do
     # Directive: "Interrogate each active feature branch. If it contains unique development progress... merge it into main."
     # For safety in this script, we only forward merge branches with the 'feat/ready-' prefix.
     if [[ $BRANCH == feat/ready-* ]]; then
-        echo "Forward Merge: Merging $BRANCH back into main..."
-        git checkout main
+        echo "Forward Merge: Merging $BRANCH back into $MAIN_BRANCH..."
+        git checkout $MAIN_BRANCH
         if git merge "$BRANCH" --no-edit; then
-            echo "Successfully merged $BRANCH into main."
+            echo "Successfully merged $BRANCH into $MAIN_BRANCH."
             git checkout "$BRANCH" # Go back to feature branch for final state
         else
             echo "CONFLICT detected during forward merge of $BRANCH. Aborting."
@@ -88,9 +96,9 @@ done
 
 # Ensure we are back on the initial branch and it is caught up
 CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
-if [ "$CURRENT_BRANCH" != "main" ]; then
+if [ "$CURRENT_BRANCH" != "$MAIN_BRANCH" ]; then
     echo "Finalizing sync for $CURRENT_BRANCH..."
-    git merge "$REMOTE/main" --no-edit || echo "Final sync merge failed. Manual intervention required."
+    git merge "$REMOTE/$MAIN_BRANCH" --no-edit || echo "Final sync merge failed. Manual intervention required."
 fi
 
 echo "Step 3: Workspace Cleanup, Documentation, & Push"
@@ -98,6 +106,19 @@ echo "Step 3: Workspace Cleanup, Documentation, & Push"
 # Governance: Source version
 VERSION=$(cat VERSION.md)
 echo "Current Version: $VERSION"
+
+# Batch Script Validation: Ensure execution scripts use the correct MAIN_BRANCH
+for script in build.sh start.sh; do
+    if [ -f "$script" ]; then
+        echo "Validating $script..."
+        sed -i "s/main/$MAIN_BRANCH/g" "$script"
+    fi
+done
+
+# Synchronize version across changelog and status
+if [ -f "CHANGELOG.md" ]; then
+    sed -i "s/v1.0.0-alpha.[0-9]*/$VERSION/g" CHANGELOG.md
+fi
 
 # Stage all changes
 git add .
