@@ -111,7 +111,8 @@ echo "Current Version: $VERSION"
 for script in build.sh start.sh; do
     if [ -f "$script" ]; then
         echo "Validating $script..."
-        sed -i "s/main/$MAIN_BRANCH/g" "$script"
+        # Targeted replacement using word boundaries where possible to avoid collateral damage
+        sed -i "s/\bmain\b/$MAIN_BRANCH/g" "$script"
     fi
 done
 

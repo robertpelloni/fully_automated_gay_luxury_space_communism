@@ -1,6 +1,6 @@
 # Roadmap: AI Hustle Machine
 
-_Last updated: 2026-05-30, version 1.0.0-alpha.23_
+_Last updated: 2026-05-30, version 1.0.0-alpha.35_
 
 ## Status legend
 
@@ -9,116 +9,67 @@ _Last updated: 2026-05-30, version 1.0.0-alpha.23_
 - **Experimental** — Active R&D, not dependable
 - **Vision** — Directional only
 
-## Completed (v1.0.0-alpha.23)
+## Completed (v1.0.0-alpha.35)
 
-### 1. Vector Intelligence (EXPERIMENTAL)
-- **Vector Storage**: Added `embedding` BLOB support to `SQLiteStore`.
-- **Embedding Interface**: Defined `EmbeddingProvider` for pluggable vector generation.
-- **Semantic Scaffolding**: Updated tiered memory to support vector-aware `RankedSearch`.
+### 1. Federated Delta-Sync (STABLE)
+- **Memory Mesh**: Completed the P2P-style memory reconciliation loop (`request_entry`/`provide_entry`) in `MemorySwarm`.
+- **Bidirectional Handshaking**: Implemented `peer_id` parameters for routed sync responses across the A2A mesh.
+- **Continuous Verification**: Integrated `sync_integration_test.go` as a permanent repository safeguard.
+
+## Completed (v1.0.0-alpha.34)
+
+### 1. Alpha Handoff (BETA)
+- **Mesh Data Flow**: Implemented automated Research-to-Trading data flow via `alpha_discovery` events.
+- **Dynamic Watchlist**: Trading module now automatically updates based on mesh discoveries.
+
+## Completed (v1.0.0-alpha.32)
+
+### 1. Advanced Technical Analysis (BETA)
+- **Momentum Indicators**: Added Relative Strength Index (RSI) with Bullish/Bearish Divergence detection to the Trading module.
+- **Confluence Strategy**: Decision engine now utilizes both SMA crossovers and RSI signals.
+
+## Completed (v1.0.0-alpha.31)
+
+### 1. Networked Pub/Sub (BETA)
+- **Topic Forwarding**: Extended `A2ABroker` to support topic-based message forwarding across remote peers.
+- **Mesh Ingestion**: Enhanced HTTP API to consume and re-broadcast mesh topic traffic.
+
+## Completed (v1.0.0-alpha.26)
+
+### 1. Unified Task Dispatch (STABLE)
+- **`hustle://` Protocol**: Introduced a standardized URI-based routing system for dispatching hustle tasks.
+- **Mesh URI Execution**: Added direct message listeners that execute incoming protocol commands from remote peers.
+
+## Completed (v1.0.0-alpha.25)
+
+### 1. Curation Chain (BETA)
+- **Automated Pipeline**: Implemented a multi-module chain connecting content discovery to social media staging.
+- **Functional Vector Search**: Integrated Go-level cosine similarity for semantic memory retrieval.
+
+## Completed (v1.0.0-alpha.24)
+
+### 1. Social Media Scaffolding (BETA)
+- **API Structures**: Implemented real-world HTTP client structures for Twitter and LinkedIn.
+- **Module Providers**: Added `NewTwitterProvider` and `NewLinkedInProvider` factory functions.
 
 ## Completed (v1.0.0-alpha.22)
 
 ### 1. External Data Sourcing (BETA)
 - **RSS/Atom Integration**: Functional `FeedFetcher` in `hustle/curation` module using `gofeed`.
-- **Real-world Curation**: Content synthesis now uses live external feed data.
 
 ### 2. Infrastructure Hardening (STABLE)
-- **API Governance**: Implemented `RateLimiter` to protect against provider rate limits and cost overruns.
-- **Protocol Reconciliation**: Enhanced `sync.sh` with the full "Executive Protocol" for multi-branch reconciliation.
+- **API Governance**: Implemented `RateLimiter` to protect against provider rate limits.
+- **Executive Protocol**: Hardened `sync.sh` with the full "Executive Protocol" for multi-branch reconciliation.
 
-### 3. User Interface (BETA)
-- **Interactive Menu**: Added `-interactive` mode for manual orchestration and module launching.
-- **Enhanced Dashboard**: Improved visual labels and descriptions for machine state monitoring.
-
-## Completed (v1.0.0-alpha.21)
-
-### 1. Robust Scheduling (BETA)
-- **Task Persistence**: Implemented `SaveState`/`LoadState` in `orchestrator/scheduler.go` to persist task history in `tasks.json`.
-
-### 2. Curation module (EXPERIMENTAL)
-- **Scaffolding**: Initial module for automated content curation and newsletter generation.
-
-## Completed (v1.0.0-alpha.20)
-
-### 1. Autonomous Scheduling (BETA)
-- **Task Scheduler**: Implemented `orchestrator/scheduler.go` for periodic hustle execution.
-- **Daemon Mode**: Added `-daemon` flag to orchestrator CLI for background operation.
-
-## Completed (v1.0.0-alpha.19)
-
-### 1. Professional Output (BETA)
-- **Real PDF Generation**: Integrated `gofpdf` into the research module for legitimate report files.
-
-### 2. Intelligent AI Routing (BETA)
-- **Waterfall Classification**: Enhanced failover with intelligent error detection and non-retryable handling.
-
-## Completed (v1.0.0-alpha.18)
-
-### 1. Advanced Git Orchestration (BETA)
-- **Intelligent Merge Engine**: `sync.sh` now iterates and reconciles all local feature branches.
-- **Hardened Rollback**: Implementation of full Git recovery (abort merge/rebase, hard reset, cleanup).
-
-## Completed (v1.0.0-alpha.17)
-
-### 1. External Connectivity (BETA)
-- **Anthropic API**: Implemented real HTTP client for Claude 3.5 Sonnet integration.
-- **Tavily API**: Implemented real HTTP client for deep web research.
-
-## Completed (v1.0.0-alpha.16)
-
-### 1. Robust AI Infrastructure (BETA)
-- **LLM Failover**: Implemented `WaterfallLLM` for automatic provider failover.
-
-## Completed (v1.0.0-alpha.15)
-
-### 1. Council Sophistication (BETA)
-- **Weighted Voting**: Implemented role-based weights (Bull: 0.3, Bear: 0.3, Critic: 0.4).
-- **Consensus Scoring**: Added automated weighted score calculation to debates.
-
-## Completed (v1.0.0-alpha.14)
-
-### 1. Observability (BETA)
-- **Terminal Dashboard**: Live, terminal-optimized status board.
-
-## Completed (v1.0.0-alpha.13)
-
-### 1. Multi-Agent Council (BETA)
-- **Consensus Engine**: Implemented `orchestrator/council.go` for agent-based debates (Bull, Bear, Critic).
-
-## Completed (v1.0.0-alpha.12)
-
-### 1. Database Persistence (BETA)
-- **SQLite Backend**: Implemented `orchestrator/sqlite_store.go` for robust relational memory storage.
-
-## Completed (v1.0.0-alpha.11)
-
-### 1. Financial Reporting (BETA)
-- **Enriched Status**: `STATUS.json` now includes Revenue, Expenses, and Profit.
-
-## Completed (v1.0.0-alpha.10)
-
-### 1. Financial Intelligence (BETA)
-- **Ledger System**: Implemented `orchestrator/ledger.go` for revenue and expense tracking.
-
-## Completed (v1.0.0-alpha.9)
-
-### 1. Functional Healer Loop (BETA)
-- **State-Aware**: Tracks diagnosis and resolution in memory.
-
-## Completed (v1.0.0-alpha.8)
-
-### 1. Persistence & Portability (BETA)
-- **JSON Storage**: Tiered memory can now be saved to and loaded from `memory.json`.
-
-## Active Sprint: Phase 4 - Real World Scaling
+## Active Sprint: Phase 5 - Collective Intelligence & Vectors
 
 ### A. Core Orchestration (EXPERIMENTAL)
-- [ ] Integrate `sqlite-vec` for hyper-fast, local-first context matching.
-- [ ] Implement `hustle://` protocol handlers for deep-linking.
+- [ ] Native `sqlite-vec` extension loading for SQL-level semantic search.
+- [ ] Multi-node clustering stability and stress testing.
 
-### B. Money Machine: Real-World Execution (BETA)
-- [ ] Implement real social media API integrations (Twitter/LinkedIn). (Refining)
-- [ ] Connect Curation output to Social posting pipeline.
+### B. Money Machine: Scaled Execution (BETA)
+- [ ] Implement robust OAuth2 flow for Social modules.
+- [ ] Multi-exchange support for the Trading module.
 
 ---
 *Outstanding! Magnificent! Insanely Great! The collective grows.*
