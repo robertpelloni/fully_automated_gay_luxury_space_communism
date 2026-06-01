@@ -44,6 +44,7 @@ func main() {
 	// Initialize Trading for event handling
 	traderModule := &trading.TradingModule{
 		Orchestrator: orch,
+		Broker:       broker,
 		Fetcher:      &trading.MockPriceFetcher{},
 	}
 
@@ -152,7 +153,7 @@ func main() {
 	}
 
 	if *interactive {
-		runInteractiveMenu(orch, protocol, broker, version)
+		runInteractiveMenu(orch, protocol, broker, traderModule, version)
 		return
 	}
 
@@ -267,7 +268,7 @@ func runCurationChain(orch *orchestrator.Orchestrator) error {
 	return nil
 }
 
-func runInteractiveMenu(orch *orchestrator.Orchestrator, protocol *orchestrator.HustleProtocol, broker *orchestrator.A2ABroker, version string) {
+func runInteractiveMenu(orch *orchestrator.Orchestrator, protocol *orchestrator.HustleProtocol, broker *orchestrator.A2ABroker, traderModule *trading.TradingModule, version string) {
 	reader := bufio.NewReader(os.Stdin)
 	for {
 		fmt.Println("\n--- INTERACTIVE COMMAND MENU ---")
@@ -278,8 +279,9 @@ func runInteractiveMenu(orch *orchestrator.Orchestrator, protocol *orchestrator.
 		fmt.Println("5. Launch FULL CHAIN (Curate -> Post)")
 		fmt.Println("6. Trigger Swarm Sync")
 		fmt.Println("7. Broadcast Custom Mesh Event")
-		fmt.Println("8. View Dashboard")
-		fmt.Println("9. Run Repository Sync")
+		fmt.Println("8. Trading: SELL ALL & Clear History")
+		fmt.Println("9. View Dashboard")
+		fmt.Println("10. Run Repository Sync")
 		fmt.Println("q. Quit")
 		fmt.Print("Select an option: ")
 
@@ -312,10 +314,23 @@ func runInteractiveMenu(orch *orchestrator.Orchestrator, protocol *orchestrator.
 				Timestamp: time.Now(),
 			})
 		case "8":
+			fmt.Println("Executing SELL ALL and clearing technical history...")
+			traderModule.History = []float64{}
+			traderModule.RSIHistory = []float64{}
+			broker.Publish(orchestrator.Message{
+				ID:        fmt.Sprintf("sell-all-%d", time.Now().Unix()),
+				Source:    "interactive-user",
+				Type:      orchestrator.Command,
+				Topic:     "trade_execution",
+				Payload:   "ACTION: SELL_ALL, Reason: Manual intervention",
+				Timestamp: time.Now(),
+			})
+			fmt.Println("History cleared. SELL_ALL broadcasted to mesh.")
+		case "9":
 			orchestrator.ShowDashboard(orch)
 			fmt.Println("\nPress Enter to return to menu...")
 			reader.ReadString('\n')
-		case "9":
+		case "10":
 			if err := runSyncProtocol(); err != nil {
 				fmt.Printf("Sync error: %v\n", err)
 			}
