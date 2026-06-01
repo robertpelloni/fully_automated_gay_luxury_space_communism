@@ -1,26 +1,26 @@
-# Session Handoff - v1.0.0-alpha.35
+# Session Handoff - v1.0.0-alpha.36
 
 ## Current Status
-- **Version:** `1.0.0-alpha.35` (Stable Alpha)
+- **Version:** `1.0.0-alpha.36` (Stable Alpha)
 - **Architecture:** Federated multi-module "hustle" ecosystem managed by a central Orchestrator.
-- **Mesh State:** A2A Broker functional with Topic Pub/Sub and direct messaging.
-- **Sync State:** `sync.sh` implements the "Executive Protocol". Federated Delta-Sync for memory is operational.
+- **Merge Engine:** Executive Protocol (`sync.sh`) fully operational with automated reconciliation.
+- **Mesh State:** A2A Broker functional with Topic Pub/Sub and direct messaging. Trading and Healer modules mesh-enabled.
 
 ## Recent Achievements
-- **Delta-Sync Protocol:** Finalized the reconciliation loop (`request_entry`/`provide_entry`). Peer identification via `peer_id` ensures responses route correctly through the mesh.
-- **Mesh Execution:** The Orchestrator now listens for `hustle://` URIs sent via direct A2A messages, allowing remote peers to trigger local tasks.
-- **Algorithmic Trading:** RSI Divergence and SMA indicators are active. Trading watchlist automatically updates via Research discoveries (`alpha_discovery` events).
-- **Curation Pipeline:** Sequential chain from RSS discovery to Social staging is functional in daemon mode.
+- **AI-Driven Healer:** Promoted the `Healer` module to use LLM for diagnosis and fix generation. Verified via `hustle://healer` protocol.
+- **Executive Protocol Finalization:** Refined the Intelligent Merge Engine in `sync.sh` to handle branch name detection and automated cross-branch reconciliation.
+- **Mesh Trading:** Integrated the `TradingModule` with the A2A mesh, enabling distributed trade intelligence and manual SELL_ALL overrides.
+- **Infrastructure:** Enhanced `build.sh` to include the Trading module and updated `SQLiteStore` for native extension support.
 
 ## Knowledge for Successor Models
-- **Protocol Registration:** Modules MUST register with the `HustleProtocol` in `main.go` to avoid circular imports.
-- **Memory Tiers:** L1 (Volatile/Audit), L2 (Durable/Metadata), L3 (Cold/Persistent). Delta-sync only focuses on L2/L3.
-- **Mesh Routing:** Remote peers are registered via `/register`. Forwarding is handled transparently by `A2ABroker.Route()`.
-- **Git Automation:** Always use `./sync.sh` for repository maintenance. It handles the stashing and dual-direction merging.
+- **Branch Strategy:** The system automatically identifies the main branch (main/master). Feature branches are reconciled via `sync.sh`.
+- **Healer Usage:** Trigger a recovery loop via `hustle://healer?issue=...`.
+- **Trading Mesh:** Listen to the `trade_execution` mesh topic for coordinated signals.
+- **Build Process:** Use `./build.sh` to compile all components (binaries go to `bin/`).
 
 ## Next Milestones
-- [ ] Implement OAuth2 for Social providers (Twitter/LinkedIn).
-- [ ] Native `sqlite-vec` extension loading for SQL-level semantic search.
-- [ ] Multi-node clustering stability testing.
+- [ ] Implement multi-exchange support for the Trading module (Binance/Coinbase).
+- [ ] Stress test the federated mesh with >5 concurrent nodes.
+- [ ] Browser extension for context attachment.
 
-*The AI Hustle Machine is autonomous. The era of humanity has been heralded.*
+*The AI Hustle Machine has achieved self-healing and distributed intelligence.*

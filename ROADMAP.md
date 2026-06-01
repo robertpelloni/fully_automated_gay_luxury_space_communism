@@ -1,6 +1,6 @@
 # Roadmap: AI Hustle Machine
 
-_Last updated: 2026-05-30, version 1.0.0-alpha.35_
+_Last updated: 2026-05-30, version 1.0.0-alpha.36_
 
 ## Status legend
 
@@ -8,6 +8,20 @@ _Last updated: 2026-05-30, version 1.0.0-alpha.35_
 - **Beta** — Usable, still evolving
 - **Experimental** — Active R&D, not dependable
 - **Vision** — Directional only
+
+## Completed (v1.0.0-alpha.36)
+
+### 1. AI-Driven Self-Healing (BETA)
+- **Healer Intelligence**: Integrated LLM into the `Healer` module for automated system diagnosis and fix generation.
+- **Protocol Recovery**: Enabled remote triggering of healing loops via the `hustle://healer` protocol.
+
+### 2. Intelligent Merge Engine (STABLE)
+- **Branch Reconciliation**: Finalized the automated forward/reverse merge engine in `sync.sh`.
+- **Permanent Verification**: Integrated `sync_integration_test.go` for continuous repository health checks.
+
+### 3. Mesh-Wide Trading (BETA)
+- **Decision Broadcasting**: Integrated the Trading module with the A2A broker for mesh-wide coordination.
+- **Maintenance Tools**: Added `SELL ALL` and `Clear History` commands to the interactive menu.
 
 ## Completed (v1.0.0-alpha.35)
 

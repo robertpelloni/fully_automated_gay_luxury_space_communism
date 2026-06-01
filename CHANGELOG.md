@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.0.0-alpha.36] - 2026-05-30
+### Added
+- **AI-Driven Self-Healing (BETA)**: Enhanced the `Healer` module to utilize LLM for context-aware system diagnosis and fix generation.
+- **Intelligent Merge Engine (STABLE)**: Finalized Step 2 of the Executive Protocol, supporting automated forward/reverse merges and permanent sync integration testing.
+- **Mesh-wide Trading Coordination**: Integrated `TradingModule` with the A2A Broker for broadcasting trade decisions across the mesh.
+
 ## [1.0.0-alpha.35] - 2026-05-30
 ### Added
 - **Automated Delta-Sync (STABLE)**: Completed the federated memory reconciliation loop.
