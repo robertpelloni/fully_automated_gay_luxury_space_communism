@@ -82,11 +82,24 @@ func main() {
 
 	// Register Handlers
 	protocol.Register("research", func(p url.Values) error {
+		action := p.Get("action")
 		query := p.Get("query")
 		if query == "" { query = "AI Trends" }
+
 		searcher := research.NewResearchSearch(research.Tavily, orch, broker)
-		_, err := searcher.Query(query)
-		return err
+		results, err := searcher.Query(query)
+		if err != nil { return err }
+
+		if action == "analyze" && len(results) > 0 {
+			fmt.Println("[Research] Performing deep AI analysis of findings...")
+			for _, res := range results {
+				prompt := fmt.Sprintf("Summarize the revolutionary potential of this finding: %s", res.Snippet)
+				summary, _ := orch.LLM.Generate(prompt)
+				fmt.Printf("[Research] Deep Insight: %s\n", summary)
+			}
+		}
+
+		return nil
 	})
 	protocol.Register("curation", func(p url.Values) error {
 		topic := p.Get("topic")
