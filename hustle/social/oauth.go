@@ -2,8 +2,10 @@ package social
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"golang.org/x/oauth2"
+	"os"
 	"time"
 )
 
@@ -63,5 +65,33 @@ func (s *OAuthState) Exchange(ctx context.Context, code string) error {
 	}
 	s.Token = tok
 	fmt.Printf("[OAuth] Successfully exchanged code for %s token\n", s.Provider)
+	return s.Save()
+}
+
+// Save persists the token to a local JSON file
+func (s *OAuthState) Save() error {
+	if s.Token == nil {
+		return nil
+	}
+	data, err := json.MarshalIndent(s.Token, "", "  ")
+	if err != nil {
+		return err
+	}
+	return os.WriteFile(fmt.Sprintf("token_%s.json", s.Provider), data, 0600)
+}
+
+// Load restores the token from a local JSON file
+func (s *OAuthState) Load() error {
+	filename := fmt.Sprintf("token_%s.json", s.Provider)
+	data, err := os.ReadFile(filename)
+	if err != nil {
+		return err
+	}
+	var tok oauth2.Token
+	if err := json.Unmarshal(data, &tok); err != nil {
+		return err
+	}
+	s.Token = &tok
+	fmt.Printf("[OAuth] Loaded %s token from %s\n", s.Provider, filename)
 	return nil
 }

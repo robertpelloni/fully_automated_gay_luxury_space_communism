@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"context"
 	"flag"
 	"fmt"
 	"github.com/robertpelloni/hustle/hustle/curation"
@@ -47,6 +48,8 @@ func main() {
 		Broker:       broker,
 		Fetcher:      &trading.MockPriceFetcher{},
 	}
+
+	socialModule := social.NewSocialModule(orch)
 
 	// Mesh Event Listener: Alpha Discovery
 	alphaCh := broker.SubscribeTopic("alpha_discovery")
@@ -96,16 +99,35 @@ func main() {
 		return c.Curate(topic)
 	})
 	protocol.Register("social", func(p url.Values) error {
+		action := p.Get("action")
 		platform := p.Get("platform")
 		if platform == "" { platform = "Twitter" }
-		topic := p.Get("topic")
-		if topic == "" { topic = "AI" }
 
-		var provider social.Provider = social.NewTwitterProvider()
+		// Standardize platform key
+		platKey := "Twitter"
 		if strings.ToLower(platform) == "linkedin" {
-			provider = social.NewLinkedInProvider()
+			platKey = "LinkedIn"
 		}
-		social.SchedulePost(orch, provider, platform, topic)
+
+		provider, ok := socialModule.Providers[platKey]
+		if !ok {
+			return fmt.Errorf("social provider %s not found", platform)
+		}
+
+		switch action {
+		case "auth":
+			code := p.Get("code")
+			if code == "" {
+				authURL := provider.Auth.Config.AuthCodeURL("state-token")
+				fmt.Printf("[Social] Please authorize %s at: %s\n", platform, authURL)
+				return nil
+			}
+			return provider.Auth.Exchange(context.Background(), code)
+		default:
+			topic := p.Get("topic")
+			if topic == "" { topic = "AI" }
+			social.SchedulePost(orch, provider, platform, topic)
+		}
 		return nil
 	})
 	protocol.Register("trading", func(p url.Values) error {
@@ -275,7 +297,8 @@ func runCurationChain(orch *orchestrator.Orchestrator) error {
 
 	// 3. Post to Social
 	fmt.Println("Forwarding curated blurb to Social module...")
-	provider := social.NewTwitterProvider()
+	mod := social.NewSocialModule(orch)
+	provider := mod.Providers["Twitter"]
 	// We use the curated content as a basis for the social post
 	social.SchedulePost(orch, provider, "Twitter", "the following curated insight: "+lastCurated)
 
