@@ -3,7 +3,6 @@ package social
 import (
 	"fmt"
 	"github.com/robertpelloni/hustle/orchestrator"
-	"os"
 	"time"
 )
 
@@ -17,64 +16,24 @@ type Provider interface {
 	Post(content string) error
 }
 
-type AuthenticatedProvider struct {
-	Name string
-	Auth *OAuthState
-}
-
-func (p *AuthenticatedProvider) Post(content string) error {
-	fmt.Printf("[%s] Posting: %s\n", p.Name, content)
-
-	// Simulation of using the token
-	if p.Auth != nil && p.Auth.Token != nil {
-		fmt.Printf("[%s] Using Bearer Token: %s...\n", p.Name, p.Auth.Token.AccessToken[:10])
-	} else {
-		fmt.Printf("[%s] Warning: No authentication token found. Posting in mock mode.\n", p.Name)
-	}
-
+type TwitterProvider struct{}
+func (p *TwitterProvider) Post(content string) error {
+	fmt.Printf("[Twitter] Posting: %s\n", content)
 	return nil
 }
 
-func NewTwitterProvider(auth *OAuthState) *AuthenticatedProvider {
-	return &AuthenticatedProvider{Name: "Twitter", Auth: auth}
+func NewTwitterProvider() *TwitterProvider {
+	return &TwitterProvider{}
 }
 
-func NewLinkedInProvider(auth *OAuthState) *AuthenticatedProvider {
-	return &AuthenticatedProvider{Name: "LinkedIn", Auth: auth}
+type LinkedInProvider struct{}
+func (p *LinkedInProvider) Post(content string) error {
+	fmt.Printf("[LinkedIn] Posting: %s\n", content)
+	return nil
 }
 
-type SocialModule struct {
-	Orchestrator *orchestrator.Orchestrator
-	Providers    map[string]*AuthenticatedProvider
-}
-
-func NewSocialModule(orch *orchestrator.Orchestrator) *SocialModule {
-	m := &SocialModule{
-		Orchestrator: orch,
-		Providers:    make(map[string]*AuthenticatedProvider),
-	}
-
-	// Initialize Twitter
-	twitterAuth := NewOAuthState("Twitter",
-		os.Getenv("TWITTER_CLIENT_ID"),
-		os.Getenv("TWITTER_CLIENT_SECRET"),
-		[]string{"tweet.read", "tweet.write", "users.read"},
-		"https://twitter.com/i/oauth2/authorize",
-		"https://api.twitter.com/2/oauth2/token")
-	twitterAuth.Load()
-	m.Providers["Twitter"] = NewTwitterProvider(twitterAuth)
-
-	// Initialize LinkedIn
-	linkedinAuth := NewOAuthState("LinkedIn",
-		os.Getenv("LINKEDIN_CLIENT_ID"),
-		os.Getenv("LINKEDIN_CLIENT_SECRET"),
-		[]string{"w_member_social"},
-		"https://www.linkedin.com/oauth/v2/authorization",
-		"https://www.linkedin.com/oauth/v2/accessToken")
-	linkedinAuth.Load()
-	m.Providers["LinkedIn"] = NewLinkedInProvider(linkedinAuth)
-
-	return m
+func NewLinkedInProvider() *LinkedInProvider {
+	return &LinkedInProvider{}
 }
 
 func GenerateContent(orch *orchestrator.Orchestrator, topic string) string {

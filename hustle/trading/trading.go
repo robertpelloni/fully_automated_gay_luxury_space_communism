@@ -1,12 +1,9 @@
 package trading
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/robertpelloni/hustle/orchestrator"
 	"math/rand"
-	"net/http"
-	"strings"
 	"time"
 )
 
@@ -21,47 +18,6 @@ func (m *MockPriceFetcher) GetPrice(symbol string) (float64, error) {
 	return 50000.0 + rand.Float64()*1000.0, nil
 }
 
-type CoinGeckoFetcher struct{}
-
-func (c *CoinGeckoFetcher) GetPrice(symbol string) (float64, error) {
-	// Map common symbols to CoinGecko IDs
-	ids := map[string]string{
-		"BTC": "bitcoin",
-		"ETH": "ethereum",
-		"SOL": "solana",
-	}
-
-	id, ok := ids[symbol]
-	if !ok {
-		return 0, fmt.Errorf("symbol %s not supported by CoinGecko fetcher", symbol)
-	}
-
-	fmt.Printf("[Trading] Sourcing real-world price for %s via CoinGecko API...\n", id)
-
-	url := fmt.Sprintf("https://api.coingecko.com/api/v3/simple/price?ids=%s&vs_currencies=usd", id)
-	resp, err := http.Get(url)
-	if err != nil {
-		return 0, err
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return 0, fmt.Errorf("coingecko returned status %d", resp.StatusCode)
-	}
-
-	var data map[string]map[string]float64
-	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
-		return 0, err
-	}
-
-	price, ok := data[id]["usd"]
-	if !ok {
-		return 0, fmt.Errorf("usd price not found for %s", id)
-	}
-
-	return price, nil
-}
-
 type TradingModule struct {
 	Orchestrator *orchestrator.Orchestrator
 	Broker       *orchestrator.A2ABroker
@@ -70,17 +26,6 @@ type TradingModule struct {
 	History      []float64
 	RSIHistory   []float64
 	Watchlist    []string
-}
-
-func (t *TradingModule) ExecuteAll() error {
-	fmt.Printf("[Trading] Executing strategy for entire watchlist: %v\n", t.Watchlist)
-	for _, sym := range t.Watchlist {
-		t.Symbol = sym
-		if err := t.ExecuteStrategy(); err != nil {
-			fmt.Printf("[Trading] Error executing for %s: %v\n", sym, err)
-		}
-	}
-	return nil
 }
 
 func (t *TradingModule) ExecuteStrategy() error {
@@ -108,22 +53,13 @@ func (t *TradingModule) ExecuteStrategy() error {
 		fmt.Printf("[Trading] DIVERGENCE DETECTED: %s\n", divergence)
 	}
 
-	// Algorithmic Confluence: Check Research Sentiment
-	sentiment := t.getResearchSentiment()
-	fmt.Printf("[Trading] External Sentiment: %s\n", sentiment)
-
 	decision := "HOLD"
 	if len(t.History) >= 14 {
 		// Complex Decision Engine with Confluence
-		// Research sentiment acts as a confirmation filter
 		if (rsi < 30 && price < sma) || divergence == "BULLISH" {
-			if sentiment == "BULLISH" || sentiment == "NEUTRAL" {
-				decision = "BUY"
-			}
+			decision = "BUY"
 		} else if (rsi > 70 && price > sma) || divergence == "BEARISH" {
-			if sentiment == "BEARISH" || sentiment == "NEUTRAL" {
-				decision = "SELL"
-			}
+			decision = "SELL"
 		}
 	} else {
 		fmt.Println("[Trading] Insufficient history for complex indicators, defaulting to HOLD.")
@@ -216,35 +152,6 @@ func (t *TradingModule) calculateSMA(period int) float64 {
 		sum += t.History[i]
 	}
 	return sum / float64(count)
-}
-
-func (t *TradingModule) getResearchSentiment() string {
-	memories := t.Orchestrator.L1.Search("sentiment")
-	if len(memories) == 0 {
-		return "NEUTRAL"
-	}
-
-	// Get latest sentiment for this symbol
-	for i := len(memories) - 1; i >= 0; i-- {
-		hasSymbol := false
-		for _, tag := range memories[i].Tags {
-			if tag == t.Symbol {
-				hasSymbol = true
-				break
-			}
-		}
-
-		if hasSymbol {
-			if strings.Contains(strings.ToUpper(memories[i].Content), "BULLISH") {
-				return "BULLISH"
-			}
-			if strings.Contains(strings.ToUpper(memories[i].Content), "BEARISH") {
-				return "BEARISH"
-			}
-		}
-	}
-
-	return "NEUTRAL"
 }
 
 func (t *TradingModule) calculateRSI(period int) float64 {

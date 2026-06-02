@@ -2,7 +2,6 @@ package orchestrator
 
 import (
 	"fmt"
-	"net/url"
 	"strings"
 	"time"
 )
@@ -60,7 +59,7 @@ func (s *MemorySwarm) ProvideIndex(peerID string) {
 		Source:    "local-node",
 		Target:    peerID,
 		Type:      Response,
-		Payload:   fmt.Sprintf("hustle://swarm?action=provide_index&peer_id=local-node&data=%s", url.QueryEscape(payload)),
+		Payload:   fmt.Sprintf("hustle://swarm?action=provide_index&peer_id=local-node&data=%s", payload),
 		Timestamp: time.Now(),
 	}
 	s.Broker.Route(msg)
@@ -98,7 +97,7 @@ func (s *MemorySwarm) RequestEntry(peerID, entryID string) {
 		Source:    "local-node",
 		Target:    peerID,
 		Type:      Query,
-		Payload:   fmt.Sprintf("hustle://swarm?action=request_entry&peer_id=local-node&id=%s", url.QueryEscape(entryID)),
+		Payload:   fmt.Sprintf("hustle://swarm?action=request_entry&peer_id=local-node&id=%s", entryID),
 		Timestamp: time.Now(),
 	}
 	s.Broker.Route(msg)
@@ -120,7 +119,7 @@ func (s *MemorySwarm) ProvideEntry(peerID, entryID string) {
 		Source:    "local-node",
 		Target:    peerID,
 		Type:      Response,
-		Payload:   fmt.Sprintf("hustle://swarm?action=provide_entry&peer_id=local-node&id=%s&content=%s", entry.ID, url.QueryEscape(entry.Content)),
+		Payload:   fmt.Sprintf("hustle://swarm?action=provide_entry&peer_id=local-node&id=%s&content=%s", entry.ID, entry.Content),
 		Timestamp: time.Now(),
 	}
 

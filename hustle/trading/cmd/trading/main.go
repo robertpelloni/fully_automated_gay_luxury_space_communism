@@ -13,7 +13,6 @@ func main() {
 	trader := &trading.TradingModule{
 		Orchestrator: orch,
 		Symbol:       "BTC",
-		Fetcher:      &trading.MockPriceFetcher{},
 	}
 
 	if err := trader.ExecuteStrategy(); err != nil {
