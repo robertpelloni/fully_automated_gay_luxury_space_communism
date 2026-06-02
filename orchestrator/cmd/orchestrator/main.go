@@ -38,6 +38,7 @@ func main() {
 	fmt.Printf("=== AI Hustle Machine Orchestrator v%s ===\n", version)
 
 	orch := orchestrator.NewOrchestrator()
+	orch.Version = version
 	protocol := orchestrator.NewHustleProtocol()
 	broker := orchestrator.NewA2ABroker(orch)
 	swarm := orchestrator.NewMemorySwarm(orch, broker)

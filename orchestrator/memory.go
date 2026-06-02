@@ -172,6 +172,7 @@ func (m *L3Memory) Checksum() string {
 
 // Orchestrator handles tiered memory orchestration, financial tracking, and LLM access
 type Orchestrator struct {
+	Version   string            `json:"version"`
 	L1        L1Memory          `json:"l1"`
 	L2        L2Memory          `json:"l2"`
 	L3        L3Memory          `json:"l3"`

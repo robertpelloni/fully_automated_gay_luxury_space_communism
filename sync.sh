@@ -24,6 +24,11 @@ echo "Main branch detected: $MAIN_BRANCH"
 echo "Fetching all remotes and tags..."
 git fetch --all --tags
 
+# Ensure local main is updated
+echo "Updating local $MAIN_BRANCH from $REMOTE..."
+git checkout $MAIN_BRANCH
+git merge $REMOTE/$MAIN_BRANCH --ff-only || git reset --hard $REMOTE/$MAIN_BRANCH
+
 
 echo "Updating submodules recursively to their latest tracking commits..."
 git submodule update --init --recursive
@@ -112,13 +117,23 @@ for script in build.sh start.sh; do
     if [ -f "$script" ]; then
         echo "Validating $script..."
         # Targeted replacement using word boundaries where possible to avoid collateral damage
-        sed -i "s/\bmain\b/$MAIN_BRANCH/g" "$script"
+        # Portable sed: use -i '' for BSD/macOS compatibility if needed, but here we detect
+        if sed --version >/dev/null 2>&1; then
+            sed -i "s/\bmain\b/$MAIN_BRANCH/g" "$script"
+        else
+            sed -i "" "s/[[:<:]]main[[:>:]]/$MAIN_BRANCH/g" "$script"
+        fi
     fi
 done
 
 # Synchronize version across changelog and status
 if [ -f "CHANGELOG.md" ]; then
-    sed -i "s/v1.0.0-alpha.[0-9]*/$VERSION/g" CHANGELOG.md
+    # Match both [1.0.0-alpha.x] and v1.0.0-alpha.x formats
+    if sed --version >/dev/null 2>&1; then
+        sed -i "s/1.0.0-alpha.[0-9]*/$VERSION/g" CHANGELOG.md
+    else
+        sed -i "" "s/1.0.0-alpha.[0-9]*/$VERSION/g" CHANGELOG.md
+    fi
 fi
 
 # Stage all changes
@@ -133,7 +148,12 @@ else
 fi
 
 # Push to server
-echo "Pushing changes to $REMOTE..."
-# git push $REMOTE $CURRENT_BRANCH # Disabled for safety in sandbox, but part of protocol
+if [ "$HUSTLE_PUSH_ENABLED" = "true" ]; then
+    echo "Pushing changes to $REMOTE..."
+    git push $REMOTE $CURRENT_BRANCH
+    git push $REMOTE --tags
+else
+    echo "Push disabled. Set HUSTLE_PUSH_ENABLED=true to enable automatic remote updates."
+fi
 
 echo "=== EXECUTIVE PROTOCOL COMPLETE ==="
