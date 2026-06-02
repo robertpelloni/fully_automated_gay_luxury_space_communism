@@ -1,7 +1,9 @@
 package orchestrator
 
 import (
+	"encoding/json"
 	"fmt"
+	"os"
 	"time"
 )
 
@@ -30,6 +32,26 @@ func NewChainManager(orch *Orchestrator, protocol *HustleProtocol) *ChainManager
 func (m *ChainManager) Register(c *Chain) {
 	m.Chains[c.Name] = c
 	fmt.Printf("[Chain] Registered workflow: %s (%d steps)\n", c.Name, len(c.Steps))
+	m.SaveState("chains.json")
+}
+
+func (m *ChainManager) SaveState(filepath string) error {
+	data, err := json.MarshalIndent(m.Chains, "", "  ")
+	if err != nil {
+		return err
+	}
+	return os.WriteFile(filepath, data, 0644)
+}
+
+func (m *ChainManager) LoadState(filepath string) error {
+	if _, err := os.Stat(filepath); os.IsNotExist(err) {
+		return nil
+	}
+	data, err := os.ReadFile(filepath)
+	if err != nil {
+		return err
+	}
+	return json.Unmarshal(data, &m.Chains)
 }
 
 func (m *ChainManager) Execute(name string) error {
