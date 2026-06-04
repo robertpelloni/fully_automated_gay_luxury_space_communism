@@ -25,6 +25,7 @@ func main() {
 	daemon := flag.Bool("daemon", false, "Run the Orchestrator as a background task scheduler")
 	interactive := flag.Bool("interactive", false, "Launch the interactive command menu")
 	apiPort := flag.String("api", "", "Start the HTTP API on specified port (e.g. 8080)")
+	realPrices := flag.Bool("real-prices", false, "Use real-world market prices via CoinGecko")
 	flag.Parse()
 
 	// Source version from VERSION.md
@@ -46,10 +47,16 @@ func main() {
 	swarm := orchestrator.NewMemorySwarm(orch, broker)
 
 	// Initialize Trading for event handling
+	var fetcher trading.PriceFetcher = &trading.MockPriceFetcher{}
+	if *realPrices {
+		fmt.Println("[Trading] Real-world price fetching enabled via CoinGecko.")
+		fetcher = &trading.CoinGeckoFetcher{}
+	}
+
 	traderModule := &trading.TradingModule{
 		Orchestrator: orch,
 		Broker:       broker,
-		Fetcher:      &trading.MockPriceFetcher{},
+		Fetcher:      fetcher,
 	}
 
 	// Mesh Event Listener: Alpha Discovery
