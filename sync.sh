@@ -61,27 +61,45 @@ for BRANCH in $ALL_LOCAL_BRANCHES; do
     fi
 
     # Reverse Merge: Merging main into feature branch
-    echo "Reverse Merge: Merging $REMOTE/$MAIN_BRANCH into $BRANCH..."
-    if git merge "$REMOTE/$MAIN_BRANCH" --no-edit; then
-        echo "Successfully caught up $BRANCH with $REMOTE/$MAIN_BRANCH."
+    if git rev-parse --verify "$REMOTE/$MAIN_BRANCH" >/dev/null 2>&1; then
+        echo "Reverse Merge: Merging $REMOTE/$MAIN_BRANCH into $BRANCH..."
+        if git merge "$REMOTE/$MAIN_BRANCH" --no-edit; then
+            echo "Successfully caught up $BRANCH with $REMOTE/$MAIN_BRANCH."
+        else
+            echo "CONFLICT or error detected on $BRANCH. Aborting reverse merge."
+            git merge --abort || true
+        fi
     else
-        echo "CONFLICT detected on $BRANCH. Aborting reverse merge."
-        git merge --abort
+        # Fallback to local main if remote main is not found (common in certain test environments)
+        if git rev-parse --verify "$MAIN_BRANCH" >/dev/null 2>&1; then
+            echo "Reverse Merge: Merging local $MAIN_BRANCH into $BRANCH..."
+            if git merge "$MAIN_BRANCH" --no-edit; then
+                echo "Successfully caught up $BRANCH with local $MAIN_BRANCH."
+            else
+                echo "CONFLICT detected during local reverse merge. Aborting."
+                git merge --abort || true
+            fi
+        else
+            echo "Warning: Neither $REMOTE/$MAIN_BRANCH nor local $MAIN_BRANCH found. Skipping reverse merge."
+        fi
     fi
 
     # Forward Merge: Merging feature branch back into main (Optional/Automated)
-    # Directive: "Interrogate each active feature branch. If it contains unique development progress... merge it into main."
-    # For safety in this script, we only forward merge branches with the 'feat/ready-' prefix.
     if [[ $BRANCH == feat/ready-* ]]; then
-        echo "Forward Merge: Merging $BRANCH back into $MAIN_BRANCH..."
-        git checkout $MAIN_BRANCH
-        if git merge "$BRANCH" --no-edit; then
-            echo "Successfully merged $BRANCH into $MAIN_BRANCH."
-            git checkout "$BRANCH" # Go back to feature branch for final state
-        else
-            echo "CONFLICT detected during forward merge of $BRANCH. Aborting."
-            git merge --abort
-            git checkout "$BRANCH"
+        if git rev-parse --verify "$MAIN_BRANCH" >/dev/null 2>&1; then
+            echo "Forward Merge: Merging $BRANCH back into $MAIN_BRANCH..."
+            if git checkout "$MAIN_BRANCH"; then
+                if git merge "$BRANCH" --no-edit; then
+                    echo "Successfully merged $BRANCH into $MAIN_BRANCH."
+                    git checkout "$BRANCH"
+                else
+                    echo "CONFLICT detected during forward merge of $BRANCH. Aborting."
+                    git merge --abort || true
+                    git checkout "$BRANCH"
+                fi
+            else
+                echo "Failed to checkout $MAIN_BRANCH for forward merge. Skipping."
+            fi
         fi
     fi
 
