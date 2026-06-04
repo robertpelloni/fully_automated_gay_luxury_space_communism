@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 # THE EXECUTIVE PROTOCOL: REPOSITORY SYNCHRONIZATION & INTELLIGENT MERGE
 # This script maintains repository health by reconciling all local feature branches with main.
 
@@ -18,11 +19,13 @@ echo "Using remote: $REMOTE"
 MAIN_BRANCH="main"
 if git branch -r | grep -q "$REMOTE/master"; then
     MAIN_BRANCH="master"
+elif git branch | grep -q "\bmaster\b"; then
+    MAIN_BRANCH="master"
 fi
 echo "Main branch detected: $MAIN_BRANCH"
 
 echo "Fetching all remotes and tags..."
-git fetch --all --tags
+git fetch --all --tags || echo "Warning: Fetch failed, continuing with local state."
 
 
 echo "Updating submodules recursively to their latest tracking commits..."
@@ -45,11 +48,11 @@ for BRANCH in $ALL_LOCAL_BRANCHES; do
 
     echo "--- Reconciling Branch: $BRANCH ---"
 
-    # Stash if necessary
+    # Stash if necessary (including untracked files)
     STASHED=false
     if [[ $(git status --porcelain) ]]; then
         echo "Stashing local changes..."
-        git stash
+        git stash -u
         STASHED=true
     fi
 
@@ -59,28 +62,43 @@ for BRANCH in $ALL_LOCAL_BRANCHES; do
         continue
     fi
 
-    # Reverse Merge: Merging main into feature branch
-    echo "Reverse Merge: Merging $REMOTE/$MAIN_BRANCH into $BRANCH..."
-    if git merge "$REMOTE/$MAIN_BRANCH" --no-edit; then
-        echo "Successfully caught up $BRANCH with $REMOTE/$MAIN_BRANCH."
-    else
-        echo "CONFLICT detected on $BRANCH. Aborting reverse merge."
-        git merge --abort
+    # Determine the merge source (prefer remote, fallback to local)
+    MERGE_SOURCE="$REMOTE/$MAIN_BRANCH"
+    if ! git rev-parse --verify "$MERGE_SOURCE" >/dev/null 2>&1; then
+        if git rev-parse --verify "$MAIN_BRANCH" >/dev/null 2>&1; then
+            MERGE_SOURCE="$MAIN_BRANCH"
+        else
+            echo "Warning: Could not find merge source for $MAIN_BRANCH."
+            MERGE_SOURCE=""
+        fi
     fi
 
-    # Forward Merge: Merging feature branch back into main (Optional/Automated)
-    # Directive: "Interrogate each active feature branch. If it contains unique development progress... merge it into main."
-    # For safety in this script, we only forward merge branches with the 'feat/ready-' prefix.
-    if [[ $BRANCH == feat/ready-* ]]; then
-        echo "Forward Merge: Merging $BRANCH back into $MAIN_BRANCH..."
-        git checkout $MAIN_BRANCH
-        if git merge "$BRANCH" --no-edit; then
-            echo "Successfully merged $BRANCH into $MAIN_BRANCH."
-            git checkout "$BRANCH" # Go back to feature branch for final state
-        else
-            echo "CONFLICT detected during forward merge of $BRANCH. Aborting."
-            git merge --abort
-            git checkout "$BRANCH"
+    # Reverse Merge: Merging main into feature branch
+    if [ -n "$MERGE_SOURCE" ]; then
+    echo "Reverse Merge: Merging $MERGE_SOURCE into $BRANCH..."
+    if git merge "$MERGE_SOURCE" --no-edit; then
+        echo "Successfully caught up $BRANCH with $MERGE_SOURCE."
+    else
+        echo "CONFLICT or error detected on $BRANCH. Aborting reverse merge."
+        git merge --abort || true
+    fi
+
+        # Forward Merge: Merging feature branch back into main (Optional/Automated)
+        if [[ $BRANCH == feat/ready-* ]]; then
+            if git rev-parse --verify "$MAIN_BRANCH" >/dev/null 2>&1; then
+                echo "Forward Merge: Merging $BRANCH back into $MAIN_BRANCH..."
+                if git checkout "$MAIN_BRANCH"; then
+                    if git merge "$BRANCH" --no-edit; then
+                        echo "Successfully merged $BRANCH into $MAIN_BRANCH."
+                    else
+                        echo "CONFLICT detected during forward merge of $BRANCH. Aborting."
+                        git merge --abort || true
+                    fi
+                    git checkout "$BRANCH"
+                else
+                    echo "Failed to checkout $MAIN_BRANCH for forward merge. Skipping."
+                fi
+            fi
         fi
     fi
 
