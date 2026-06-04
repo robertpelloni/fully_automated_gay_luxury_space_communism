@@ -60,28 +60,24 @@ for BRANCH in $ALL_LOCAL_BRANCHES; do
         continue
     fi
 
-    # Reverse Merge: Merging main into feature branch
-    if git rev-parse --verify "$REMOTE/$MAIN_BRANCH" >/dev/null 2>&1; then
-        echo "Reverse Merge: Merging $REMOTE/$MAIN_BRANCH into $BRANCH..."
-        if git merge "$REMOTE/$MAIN_BRANCH" --no-edit; then
-            echo "Successfully caught up $BRANCH with $REMOTE/$MAIN_BRANCH."
-        else
-            echo "CONFLICT or error detected on $BRANCH. Aborting reverse merge."
-            git merge --abort || true
-        fi
-    else
-        # Fallback to local main if remote main is not found (common in certain test environments)
+    # Determine the merge source (prefer remote, fallback to local)
+    MERGE_SOURCE="$REMOTE/$MAIN_BRANCH"
+    if ! git rev-parse --verify "$MERGE_SOURCE" >/dev/null 2>&1; then
         if git rev-parse --verify "$MAIN_BRANCH" >/dev/null 2>&1; then
-            echo "Reverse Merge: Merging local $MAIN_BRANCH into $BRANCH..."
-            if git merge "$MAIN_BRANCH" --no-edit; then
-                echo "Successfully caught up $BRANCH with local $MAIN_BRANCH."
-            else
-                echo "CONFLICT detected during local reverse merge. Aborting."
-                git merge --abort || true
-            fi
+            MERGE_SOURCE="$MAIN_BRANCH"
         else
-            echo "Warning: Neither $REMOTE/$MAIN_BRANCH nor local $MAIN_BRANCH found. Skipping reverse merge."
+            echo "Warning: Could not find merge source for $MAIN_BRANCH. Skipping $BRANCH."
+            continue
         fi
+    fi
+
+    # Reverse Merge: Merging main into feature branch
+    echo "Reverse Merge: Merging $MERGE_SOURCE into $BRANCH..."
+    if git merge "$MERGE_SOURCE" --no-edit; then
+        echo "Successfully caught up $BRANCH with $MERGE_SOURCE."
+    else
+        echo "CONFLICT or error detected on $BRANCH. Aborting reverse merge."
+        git merge --abort || true
     fi
 
     # Forward Merge: Merging feature branch back into main (Optional/Automated)
@@ -91,12 +87,11 @@ for BRANCH in $ALL_LOCAL_BRANCHES; do
             if git checkout "$MAIN_BRANCH"; then
                 if git merge "$BRANCH" --no-edit; then
                     echo "Successfully merged $BRANCH into $MAIN_BRANCH."
-                    git checkout "$BRANCH"
                 else
                     echo "CONFLICT detected during forward merge of $BRANCH. Aborting."
                     git merge --abort || true
-                    git checkout "$BRANCH"
                 fi
+                git checkout "$BRANCH"
             else
                 echo "Failed to checkout $MAIN_BRANCH for forward merge. Skipping."
             fi
