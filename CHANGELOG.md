@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.0.0-alpha.43] - 2026-06-05
+### Added
+- **Production Deployment Suite**: Finalized integration tests and health checks for production environments.
+- **Enhanced Mesh Resilience**: Optimized peer discovery and status aggregation for multi-node clusters.
+- **Luxury Protocol Hardening**: Completed end-to-end verification of the autonomous discovery and capital protection logic.
+
 ## [1.0.0-alpha.42] - 2026-06-05
 ### Added
 - **Autonomous Luxury Protocol (BETA)**: Refined `ChainDiscoverer` to prioritize high-ROI, low-maintenance workflows.
