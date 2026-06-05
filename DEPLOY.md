@@ -1,19 +1,40 @@
-# Deployment Protocol
+# Deployment & Environment Setup
 
-## 1. Prerequisites
-- Go 1.24.x
-- Git 2.x
-- Access to LLM APIs (Anthropic, Google, etc.)
+## Prerequisites
+- **Go 1.24.3** (Mandatory toolchain)
+- **SQLite 3.45+** (With vector extension or using internal fallback)
+- **API Keys**: Tavily (Research), Anthropic/OpenAI (LLM Waterfall)
 
-## 2. Local Setup
-1. Clone the repository.
-2. Run `./sync.sh` to ensure all submodules and branches are aligned.
-3. Run `./build.sh` to compile the orchestrator and hustle modules.
+## Production Installation
+1.  **Clone & Update**:
+    ```bash
+    git clone --recursive https://github.com/robertpelloni/fully_automated_gay_luxury_space_communism
+    cd fully_automated_gay_luxury_space_communism
+    ```
+2.  **Environment Check**:
+    ```bash
+    go version # Ensure 1.24.3
+    ./build.sh
+    ```
 
-### External API Keys
-- `TAVILY_API_KEY`: Required for Research module.
-- `ANTHROPIC_API_KEY`: Required for LLM-driven orchestration.
-- `COINGECKO_API_KEY`: (Optional) For Pro-tier CoinGecko access.
+## Mesh Deployment (Cluster Setup)
+To launch a federated luxury mesh:
+1.  **Seed Node**:
+    ```bash
+    ./bin/orchestrator -daemon -api 8080 -real-prices
+    ```
+2.  **Peer Node**:
+    ```bash
+    ./bin/orchestrator -daemon -api 8081 -seed http://seed-ip:8080 -real-prices
+    ```
 
-## 3. Automated Execution
-The system is designed for continuous autonomous execution. Ensure environment variables for API keys are set before launching the orchestrator.
+## Performance Monitoring
+- **Global Ledger**: Monitor `ledger.json` across all nodes.
+- **Terminal Dashboard**: Run `./bin/orchestrator -dashboard` to see aggregated mesh profits.
+- **Wealth Preservation**: The system automatically audits ROI and terminates underperforming hustles. No manual intervention required.
+
+## Automated Maintenance
+The Orchestrator includes a self-healing `sync` protocol. To trigger manually:
+```bash
+./bin/orchestrator -uri "hustle://sync"
+```

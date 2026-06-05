@@ -193,6 +193,7 @@ func main() {
 
 	if *daemon {
 		scheduler := orchestrator.NewScheduler(orch)
+		scheduler.LoadState("tasks.json", protocol)
 
 		// Register Hustle Tasks using protocol
 		scheduler.Register("Research", 1*time.Hour, func(o *orchestrator.Orchestrator) error {
@@ -217,6 +218,10 @@ func main() {
 		})
 
 		scheduler.Register("ProfitAnalysis", 12*time.Hour, func(o *orchestrator.Orchestrator) error {
+			// Luxury wealth preservation audit
+			h := orchestrator.NewHealer(o)
+			h.WealthPreservation()
+
 			suggestion := o.Ledger.AnalyzeProfitability()
 			fmt.Printf("[Scheduler] Financial Analysis: %s\n", suggestion)
 
@@ -233,8 +238,14 @@ func main() {
 		})
 
 		scheduler.Register("WorkflowDiscovery", 24*time.Hour, func(o *orchestrator.Orchestrator) error {
-			_, err := discoverer.Discover()
-			return err
+			discovered, err := discoverer.Discover()
+			if err != nil { return err }
+
+			// Auto-register discovered chain into scheduler
+			scheduler.Register("DiscoveredChain:"+discovered.Name, time.Duration(discovered.IntervalMinutes)*time.Minute, func(o *orchestrator.Orchestrator) error {
+				return protocol.HandleURI(fmt.Sprintf("hustle://chain?name=%s", discovered.Name))
+			})
+			return nil
 		})
 
 		scheduler.Register("Heartbeat", 5*time.Minute, func(o *orchestrator.Orchestrator) error {
