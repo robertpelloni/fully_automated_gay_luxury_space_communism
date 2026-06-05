@@ -1,10 +1,10 @@
 {
-  "luxury_chain_name": {
-    "name": "luxury_chain_name",
-    "description": "brief luxury-focused description",
+  "curation": {
+    "name": "curation",
+    "description": "Curate AI news and post to Twitter",
     "steps": [
-      "hustle://step1",
-      "hustle://step2"
+      "hustle://curation?topic=AI",
+      "hustle://social?platform=Twitter"
     ]
   }
 }

@@ -33,7 +33,6 @@ func (s *Scheduler) Register(name string, interval time.Duration, fn func(orch *
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	// Check if already registered, update if so
 	for _, t := range s.Tasks {
 		if t.Name == name {
 			t.Interval = interval
@@ -54,6 +53,10 @@ func (s *Scheduler) Register(name string, interval time.Duration, fn func(orch *
 func (s *Scheduler) Unregister(name string) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
+	s.unregisterNoLock(name)
+}
+
+func (s *Scheduler) unregisterNoLock(name string) {
 	newTasks := make([]*Task, 0)
 	for _, t := range s.Tasks {
 		if t.Name != name {
@@ -63,13 +66,17 @@ func (s *Scheduler) Unregister(name string) {
 	if len(newTasks) != len(s.Tasks) {
 		fmt.Printf("Task unregistered: %s\n", name)
 		s.Tasks = newTasks
-		s.SaveState("tasks.json")
+		s.saveStateNoLock("tasks.json")
 	}
 }
 
 func (s *Scheduler) SaveState(filepath string) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
+	return s.saveStateNoLock(filepath)
+}
+
+func (s *Scheduler) saveStateNoLock(filepath string) error {
 	data, err := json.MarshalIndent(s.Tasks, "", "  ")
 	if err != nil {
 		return err
@@ -103,7 +110,6 @@ func (s *Scheduler) LoadState(filepath string, protocol *HustleProtocol) error {
 				break
 			}
 		}
-		// Re-register discovered chains
 		if !found && strings.HasPrefix(loaded.Name, "DiscoveredChain:") {
 			chainName := strings.TrimPrefix(loaded.Name, "DiscoveredChain:")
 			s.Tasks = append(s.Tasks, &Task{
@@ -139,7 +145,6 @@ func (s *Scheduler) ReevaluateStrategy(recommendation string) {
 func (s *Scheduler) Start() {
 	fmt.Println("Starting Task Scheduler...")
 	for {
-		// Check for ROI corrections in memory
 		s.checkROICorrections()
 
 		s.mu.Lock()
@@ -154,7 +159,7 @@ func (s *Scheduler) Start() {
 					fmt.Printf("Task %s failed: %v\n", task.Name, err)
 				}
 				task.LastRun = time.Now()
-				s.SaveState("tasks.json")
+				s.saveStateNoLock("tasks.json")
 			}
 		}
 		s.mu.Unlock()
@@ -164,13 +169,15 @@ func (s *Scheduler) Start() {
 
 func (s *Scheduler) checkROICorrections() {
 	corrections := s.Orchestrator.L1.Search("Wealth Preservation Action")
+	if len(corrections) == 0 { return }
+
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
 	for _, e := range corrections {
-		// Example: "Wealth Preservation Action: Requesting termination of underperforming hustles. Reason: ... BadHustle ..."
-		// We extract the hustle name and unregister it
 		for _, task := range s.Tasks {
 			if strings.Contains(e.Content, task.Name) {
-				fmt.Printf("[Scheduler] Executing Wealth Preservation: Unregistering %s\n", task.Name)
-				s.Unregister(task.Name)
+				s.unregisterNoLock(task.Name)
 			}
 		}
 	}

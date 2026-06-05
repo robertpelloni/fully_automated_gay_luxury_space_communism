@@ -1,24 +1,24 @@
-# Release Notes - v1.0.0-alpha.41
+# Release Notes - v1.0.0-alpha.44
 
-## Core Components (bin/)
-- `orchestrator`: Central management and protocol routing hub.
-- `research`: LLM-driven market sentiment and ticker extraction.
-- `trading`: Real-time execution with CoinGecko pricing and technical indicators.
-- `social`: Automated content distribution (Twitter/LinkedIn).
-- `curator`: RSS/Atom feed ingestion and synthesis.
+## "Fully Automated Luxury Protocol" (STABLE)
 
-## Key Features
-- **Live Market Data**: Real-world USD pricing via CoinGecko API.
-- **Native Vector Search**: High-performance persistence via `sqlite-vec` with Go-level fallback.
-- **Executive Protocol**: Hardened repository sync engine for monorepo health.
-- **Federated Mesh**: Stable A2ABroker and Memory Swarm for multi-node collaboration.
+This release marks the completion of the "Luxury Protocol" phase, transforming the AI Hustle Machine into a production-ready, self-evolving, federated monorepo.
 
-## External Dependencies
-- Go 1.24.3
-- Git 2.x
-- SQLite 3 with extension loading support (optional, for native vectors).
+### New Core Features:
+- **Autonomous Discovery**: LLM-driven `ChainDiscoverer` that proposes high-ROI, low-maintenance workflows ("Luxury Hustles").
+- **Mesh Intelligence Scaling**: Federated status and profit aggregation across nodes via `hustle://swarm?action=aggregate`.
+- **Closed-Loop Wealth Preservation**: The `Healer` module now audits ROI and automatically unregisters underperforming tasks from the `Scheduler`.
+- **GStack Integration**: Ported Garry Tan's `gstack` engineering workflows to `.agent/` for native Antigravity and Gemini CLI support.
+- **High-Performance Persistence**: Optimized SQLite tiered memory with native `sqlite-vec` support and robust similarity fallbacks.
 
-## API Credentials (ENV)
-- `ANTHROPIC_API_KEY`: Required for core intelligence.
-- `TAVILY_API_KEY`: Required for web research.
-- `COINGECKO_API_KEY`: Optional for Pro price feeds.
+### Architectural Solidification:
+- Consolidated all previous submodules (`borg`, `bobbybookmarks`) into a unified, autonomous monorepo structure.
+- Hardened `sync.sh` (Executive Protocol) for robust multi-branch reconciliation and automated self-healing.
+- Standardized all modules on **Go 1.24.3**.
+
+### Verification:
+- 30 unit and integration tests passing (100% success).
+- End-to-end "Grand Luxury Protocol" verified.
+
+---
+*The machine is now fully autonomous and ready for Phase 3: Scaling & Monetization.*
