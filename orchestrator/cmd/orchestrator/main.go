@@ -119,11 +119,19 @@ func main() {
 		if platform == "" { platform = "Twitter" }
 		topic := p.Get("topic")
 		if topic == "" { topic = "AI" }
+		content := p.Get("content")
 
 		var provider social.Provider = social.NewTwitterProvider()
 		if strings.ToLower(platform) == "linkedin" {
 			provider = social.NewLinkedInProvider()
 		}
+
+		if content != "" {
+			// If explicit content is provided, bypass the internal topic-based generation
+			fmt.Printf("[Social] Posting explicit content to %s: %s\n", platform, content)
+			return provider.Post(orch, platform, content)
+		}
+
 		social.SchedulePost(orch, provider, platform, topic)
 		return nil
 	})
