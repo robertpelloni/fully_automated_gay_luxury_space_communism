@@ -11,7 +11,7 @@
 ## Standard Installation
 1.  **Repository Setup**:
     ```bash
-    git clone --recursive https://github.com/robertpelloni/fully_automated_gay_luxury_space_communism
+    git clone https://github.com/robertpelloni/fully_automated_gay_luxury_space_communism
     cd fully_automated_gay_luxury_space_communism
     ```
 2.  **Binary Compilation**:

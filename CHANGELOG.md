@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.0.0-alpha.50] - 2026-06-06
+### Added
+- **Production-Ready Release Candidate**: Finalized all deployment configurations and monorepo verification.
+- **Unified Deployment Manual**: Updated `DEPLOY.md` with streamlined monorepo installation instructions.
+
 ## [1.0.0-alpha.49] - 2026-06-06
 ### Added
 - **Monorepo Consolidation**: Removed `gstack` submodule and ported 10 core engineering skills to native `.agent/workflows/`.
