@@ -25,6 +25,7 @@ func main() {
 	daemon := flag.Bool("daemon", false, "Run the Orchestrator as a background task scheduler")
 	interactive := flag.Bool("interactive", false, "Launch the interactive command menu")
 	apiPort := flag.String("api", "", "Start the HTTP API on specified port (e.g. 8080)")
+	seedURL := flag.String("seed", "", "URL of a mesh seed node to join the swarm")
 	realPrices := flag.Bool("real-prices", false, "Use real-world market prices via CoinGecko")
 	flag.Parse()
 
@@ -45,6 +46,13 @@ func main() {
 	discoverer := orchestrator.NewChainDiscoverer(orch, chainManager)
 	broker := orchestrator.NewA2ABroker(orch)
 	swarm := orchestrator.NewMemorySwarm(orch, broker)
+
+	if *seedURL != "" {
+		fmt.Printf("[Swarm] Joining mesh via seed: %s\n", *seedURL)
+		broker.RegisterPeer("seed-node", *seedURL)
+		// Trigger initial sync
+		protocol.HandleURI("hustle://swarm?action=sync")
+	}
 
 	// Initialize Trading for event handling
 	var fetcher trading.PriceFetcher = &trading.MockPriceFetcher{}
