@@ -453,6 +453,7 @@ func runInteractiveMenu(orch *orchestrator.Orchestrator, protocol *orchestrator.
 		fmt.Println("15. 🆕 Brainstorm Content Topics")
 		fmt.Println("16. 🆕 Start Agent Loop (10 iterations)")
 		fmt.Println("17. 🆕 Auto-Plan Hustles (LLM strategy)")
+		fmt.Println("18. 🆕 View Content Library")
 		fmt.Println(" q. Quit")
 		fmt.Print("Select an option: ")
 
@@ -565,6 +566,18 @@ func runInteractiveMenu(orch *orchestrator.Orchestrator, protocol *orchestrator.
 			} else {
 				for i, p := range plans {
 					fmt.Printf("  %d. [%s/%s] %s — %s\n", i+1, p.Category, p.Priority, p.Name, p.Description)
+				}
+			}
+		case "18":
+			files, err := os.ReadDir("output/content")
+			if err != nil {
+				fmt.Printf("Error reading content library: %v\n", err)
+			} else {
+				fmt.Println("\n📂 CONTENT LIBRARY:")
+				for _, f := range files {
+					if !f.IsDir() {
+						fmt.Printf("  - %s\n", f.Name())
+					}
 				}
 			}
 		case "q":

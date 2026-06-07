@@ -97,7 +97,7 @@ To launch a federated luxury mesh:
 - **Global Ledger**: Monitor `ledger.json` across all nodes.
 - **Terminal Dashboard**: Run `./bin/orchestrator -dashboard` to see aggregated mesh profits.
 - **Wealth Preservation**: The system automatically audits ROI and terminates underperforming hustles.
-- **Agent Loop Status**: When running in `-agent` mode, iterations/successes/errors are logged every 2 seconds.
+- **Agent Loop Status**: When running in `-agent` mode, real-time status is visible on the Dashboard (`-dashboard`).
 
 ## Automated Maintenance
 

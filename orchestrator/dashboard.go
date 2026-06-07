@@ -23,6 +23,13 @@ func ShowDashboard(orch *Orchestrator) {
 		fmt.Printf(" [CONTENT HUB]    Generated: %d pieces\n", contentCount)
 	}
 
+	// Agent Observability
+	agentEntries := orch.L1.Search("agent")
+	if len(agentEntries) > 0 {
+		lastAgent := agentEntries[len(agentEntries)-1]
+		fmt.Printf(" [AGENT STATUS]   %s\n", lastAgent.Content)
+	}
+
 	fmt.Println("--------------------------------------------------")
 	fmt.Println(" [FINANCIAL PERFORMANCE]")
 	fmt.Printf("  Revenue:        $%.2f\n", orch.Ledger.TotalRevenue())
