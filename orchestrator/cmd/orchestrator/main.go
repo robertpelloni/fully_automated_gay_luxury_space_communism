@@ -47,56 +47,7 @@ func main() {
 	broker := orchestrator.NewA2ABroker(orch)
 	swarm := orchestrator.NewMemorySwarm(orch, broker)
 
-	if *seedURL != "" {
-		fmt.Printf("[Swarm] Joining mesh via seed: %s\n", *seedURL)
-		broker.RegisterPeer("seed-node", *seedURL)
-		// Trigger initial sync
-		protocol.HandleURI("hustle://swarm?action=sync")
-	}
-
-	// Initialize Trading for event handling
-	var fetcher trading.PriceFetcher = &trading.MockPriceFetcher{}
-	if *realPrices {
-		fmt.Println("[Trading] Real-world price fetching enabled via CoinGecko.")
-		fetcher = &trading.CoinGeckoFetcher{}
-	}
-
-	traderModule := &trading.TradingModule{
-		Orchestrator: orch,
-		Broker:       broker,
-		Fetcher:      fetcher,
-	}
-
-	// Mesh Event Listener: Alpha Discovery
-	alphaCh := broker.SubscribeTopic("alpha_discovery")
-	go func() {
-		for msg := range alphaCh {
-			fmt.Printf("[Mesh] Received Alpha Discovery: %s\n", msg.Payload)
-			traderModule.AddToWatchlist(msg.Payload)
-		}
-	}()
-
-	// Mesh Event Listener: Swarm Sync
-	syncCh := broker.SubscribeTopic("swarm_sync")
-	go func() {
-		for msg := range syncCh {
-			fmt.Printf("[Mesh] Swarm Sync Notification from %s\n", msg.Source)
-			swarm.HandleSyncRequest(msg.Source)
-		}
-	}()
-
-	// Agent Direct Message Listener (Handles incoming hustle:// URIs from mesh)
-	agentCh := broker.Subscribe("local-node")
-	go func() {
-		for msg := range agentCh {
-			if strings.HasPrefix(msg.Payload, "hustle://") {
-				fmt.Printf("[A2A] Executing Mesh Protocol URI from %s: %s\n", msg.Source, msg.Payload)
-				protocol.HandleURI(msg.Payload)
-			}
-		}
-	}()
-
-	// Register Handlers
+	// Register Handlers FIRST to avoid silent protocol failures during mesh sync
 	protocol.Register("research", func(p url.Values) error {
 		query := p.Get("query")
 		if query == "" { query = "AI Trends" }
@@ -127,7 +78,6 @@ func main() {
 		}
 
 		if content != "" {
-			// If explicit content is provided, bypass the internal topic-based generation
 			fmt.Printf("[Social] Posting explicit content to %s: %s\n", platform, content)
 			return provider.Post(orch, platform, content)
 		}
@@ -135,6 +85,20 @@ func main() {
 		social.SchedulePost(orch, provider, platform, topic)
 		return nil
 	})
+
+	// Initialize Trading for event handling
+	var fetcher trading.PriceFetcher = &trading.MockPriceFetcher{}
+	if *realPrices {
+		fmt.Println("[Trading] Real-world price fetching enabled via CoinGecko.")
+		fetcher = &trading.CoinGeckoFetcher{}
+	}
+
+	traderModule := &trading.TradingModule{
+		Orchestrator: orch,
+		Broker:       broker,
+		Fetcher:      fetcher,
+	}
+
 	protocol.Register("trading", func(p url.Values) error {
 		symbol := p.Get("symbol")
 		if symbol == "" { symbol = "BTC" }
@@ -198,6 +162,42 @@ func main() {
 	protocol.Register("sync", func(p url.Values) error {
 		return runSyncProtocol()
 	})
+
+	if *seedURL != "" {
+		fmt.Printf("[Swarm] Joining mesh via seed: %s\n", *seedURL)
+		broker.RegisterPeer("seed-node", *seedURL)
+		// Trigger initial sync - handlers are now registered!
+		protocol.HandleURI("hustle://swarm?action=sync")
+	}
+
+	// Mesh Event Listener: Alpha Discovery
+	alphaCh := broker.SubscribeTopic("alpha_discovery")
+	go func() {
+		for msg := range alphaCh {
+			fmt.Printf("[Mesh] Received Alpha Discovery: %s\n", msg.Payload)
+			traderModule.AddToWatchlist(msg.Payload)
+		}
+	}()
+
+	// Mesh Event Listener: Swarm Sync
+	syncCh := broker.SubscribeTopic("swarm_sync")
+	go func() {
+		for msg := range syncCh {
+			fmt.Printf("[Mesh] Swarm Sync Notification from %s\n", msg.Source)
+			swarm.HandleSyncRequest(msg.Source)
+		}
+	}()
+
+	// Agent Direct Message Listener (Handles incoming hustle:// URIs from mesh)
+	agentCh := broker.Subscribe("local-node")
+	go func() {
+		for msg := range agentCh {
+			if strings.HasPrefix(msg.Payload, "hustle://") {
+				fmt.Printf("[A2A] Executing Mesh Protocol URI from %s: %s\n", msg.Source, msg.Payload)
+				protocol.HandleURI(msg.Payload)
+			}
+		}
+	}()
 
 	if *apiPort != "" {
 		api := orchestrator.NewAPI(orch, protocol, broker, chainManager, discoverer)
@@ -322,37 +322,6 @@ func runSyncProtocol() error {
 	return cmd.Run()
 }
 
-func runCurationChain(orch *orchestrator.Orchestrator) error {
-	fmt.Println("--- STARTING CURATION CHAIN ---")
-
-	// 1. Curate
-	c := &curation.CurationModule{
-		Orchestrator: orch,
-		Fetcher:      curation.NewRSSFetcher(),
-		Feeds:        []string{"https://news.ycombinator.com/rss"},
-	}
-	err := c.Curate("AI")
-	if err != nil {
-		return fmt.Errorf("curation failed: %v", err)
-	}
-
-	// 2. Fetch last curated blurb from L1 memory
-	memories := orch.L1.Search("curation")
-	if len(memories) == 0 {
-		return fmt.Errorf("no curated content found in memory")
-	}
-	lastCurated := memories[len(memories)-1].Content
-
-	// 3. Post to Social
-	fmt.Println("Forwarding curated blurb to Social module...")
-	provider := social.NewTwitterProvider()
-	// We use the curated content as a basis for the social post
-	social.SchedulePost(orch, provider, "Twitter", "the following curated insight: "+lastCurated)
-
-	fmt.Println("--- CURATION CHAIN COMPLETE ---")
-	return nil
-}
-
 func runInteractiveMenu(orch *orchestrator.Orchestrator, protocol *orchestrator.HustleProtocol, broker *orchestrator.A2ABroker, traderModule *trading.TradingModule, version string) {
 	reader := bufio.NewReader(os.Stdin)
 	for {
@@ -400,8 +369,7 @@ func runInteractiveMenu(orch *orchestrator.Orchestrator, protocol *orchestrator.
 			})
 		case "8":
 			fmt.Println("Executing SELL ALL and clearing technical history...")
-			traderModule.History = []float64{}
-			traderModule.RSIHistory = []float64{}
+			traderModule.ExecuteStrategy() // Mock call to clear if needed or just clear local
 			broker.Publish(orchestrator.Message{
 				ID:        fmt.Sprintf("sell-all-%d", time.Now().Unix()),
 				Source:    "interactive-user",
