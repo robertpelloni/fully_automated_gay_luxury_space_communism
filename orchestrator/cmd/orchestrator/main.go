@@ -454,6 +454,7 @@ func runInteractiveMenu(orch *orchestrator.Orchestrator, protocol *orchestrator.
 		fmt.Println("16. 🆕 Start Agent Loop (10 iterations)")
 		fmt.Println("17. 🆕 Auto-Plan Hustles (LLM strategy)")
 		fmt.Println("18. 🆕 View Content Library")
+		fmt.Println("19. 🆕 Space Communication (Mesh Control)")
 		fmt.Println(" q. Quit")
 		fmt.Print("Select an option: ")
 
@@ -579,6 +580,38 @@ func runInteractiveMenu(orch *orchestrator.Orchestrator, protocol *orchestrator.
 						fmt.Printf("  - %s\n", f.Name())
 					}
 				}
+			}
+		case "19":
+			fmt.Println("\n--- SPACE COMMUNICATION CONTROL ---")
+			fmt.Println(" 1. List Active Mesh Peers")
+			fmt.Println(" 2. Broadcast Global Directive")
+			fmt.Println(" 3. Trigger Mesh Synchronization")
+			fmt.Println(" r. Return to Main Menu")
+			fmt.Print("Select option: ")
+			meshInput, _ := reader.ReadString('\n')
+			meshInput = strings.TrimSpace(meshInput)
+
+			switch meshInput {
+			case "1":
+				fmt.Println("Active Peers:")
+				for id, url := range broker.Peers {
+					fmt.Printf("  - %s: %s\n", id, url)
+				}
+			case "2":
+				fmt.Print("Enter Global Directive: ")
+				directive, _ := reader.ReadString('\n')
+				directive = strings.TrimSpace(directive)
+				broker.Publish(orchestrator.Message{
+					ID:        fmt.Sprintf("directive-%d", time.Now().Unix()),
+					Source:    "orchestrator-ui",
+					Type:      orchestrator.Command,
+					Topic:     "global_directives",
+					Payload:   directive,
+					Timestamp: time.Now(),
+				})
+				fmt.Println("Directive broadcasted to space.")
+			case "3":
+				protocol.HandleURI("hustle://swarm?action=sync")
 			}
 		case "q":
 			fmt.Println("Exiting...")

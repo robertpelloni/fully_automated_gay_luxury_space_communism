@@ -49,6 +49,22 @@ func ShowDashboard(orch *Orchestrator) {
 	}
 
 	fmt.Println("--------------------------------------------------")
+	fmt.Println(" [SPACE COMMS (MESH TRAFFIC)]")
+
+	// Filter for mesh-specific messages
+	meshMsgs := orch.L1.Search("mesh")
+	if len(meshMsgs) > 0 {
+		if len(meshMsgs) > 3 {
+			meshMsgs = meshMsgs[len(meshMsgs)-3:]
+		}
+		for _, m := range meshMsgs {
+			fmt.Printf("  [COMMS] %s\n", m.Content)
+		}
+	} else {
+		fmt.Println("  (No active space communication detected)")
+	}
+
+	fmt.Println("--------------------------------------------------")
 	fmt.Println(" [RECENT ACTIVITY LOG]")
 
 	// Show last 3 L1 entries as events (excluding mesh_status to avoid duplication)
