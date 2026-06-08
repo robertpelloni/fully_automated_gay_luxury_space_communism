@@ -1,9 +1,16 @@
 package social
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
 	"fmt"
-	"github.com/robertpelloni/hustle/orchestrator"
+	"net/http"
+	"os"
 	"time"
+
+	"github.com/dghubble/oauth1"
+	"github.com/robertpelloni/hustle/orchestrator"
 )
 
 type SocialPost struct {
@@ -16,15 +23,69 @@ type Provider interface {
 	Post(orch *orchestrator.Orchestrator, platform, content string) error
 }
 
-type TwitterProvider struct{}
+type TwitterProvider struct {
+	DryRun bool
+	APIURL string
+}
+
+type twitterPostRequest struct {
+	Text string `json:"text"`
+}
 
 func (p *TwitterProvider) Post(orch *orchestrator.Orchestrator, platform, content string) error {
-	fmt.Printf("[Twitter] Posting to %s: %s\n", platform, content)
+	if p.DryRun {
+		fmt.Printf("[Twitter] DryRun: Posting to %s: %s\n", platform, content)
+		return nil
+	}
+
+	consumerKey := os.Getenv("TWITTER_CONSUMER_KEY")
+	consumerSecret := os.Getenv("TWITTER_CONSUMER_SECRET")
+	accessToken := os.Getenv("TWITTER_ACCESS_TOKEN")
+	accessSecret := os.Getenv("TWITTER_ACCESS_SECRET")
+
+	if consumerKey == "" || consumerSecret == "" || accessToken == "" || accessSecret == "" {
+		return errors.New("missing Twitter OAuth environment variables")
+	}
+
+	config := oauth1.NewConfig(consumerKey, consumerSecret)
+	token := oauth1.NewToken(accessToken, accessSecret)
+	httpClient := config.Client(oauth1.NoContext, token)
+
+	reqBody, err := json.Marshal(twitterPostRequest{Text: content})
+	if err != nil {
+		return fmt.Errorf("failed to marshal twitter request: %w", err)
+	}
+
+	apiURL := p.APIURL
+	if apiURL == "" {
+		apiURL = "https://api.twitter.com/2/tweets"
+	}
+
+	req, err := http.NewRequest("POST", apiURL, bytes.NewBuffer(reqBody))
+	if err != nil {
+		return fmt.Errorf("failed to create request: %w", err)
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := httpClient.Do(req)
+	if err != nil {
+		return fmt.Errorf("failed to send request to Twitter API: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+		return fmt.Errorf("twitter API error: received status code %d", resp.StatusCode)
+	}
+
+	fmt.Printf("[Twitter] Successfully posted to %s: %s\n", platform, content)
 	return nil
 }
 
 func NewTwitterProvider() *TwitterProvider {
-	return &TwitterProvider{}
+	return &TwitterProvider{
+		DryRun: os.Getenv("TWITTER_DRY_RUN") == "true" || os.Getenv("DRY_RUN") == "true",
+		APIURL: "https://api.twitter.com/2/tweets",
+	}
 }
 
 type LinkedInProvider struct{}
