@@ -8,6 +8,7 @@ require (
 )
 
 require (
+	github.com/dghubble/oauth1 v0.7.3 // indirect
 	github.com/mattn/go-sqlite3 v1.14.44 // indirect
 	golang.org/x/time v0.10.0 // indirect
 )
