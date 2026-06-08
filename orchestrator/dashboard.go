@@ -2,6 +2,7 @@ package orchestrator
 
 import (
 	"fmt"
+	"os"
 	"time"
 )
 
@@ -29,6 +30,21 @@ func ShowDashboard(orch *Orchestrator) {
 		lastAgent := agentEntries[len(agentEntries)-1]
 		fmt.Printf(" [AGENT STATUS]   %s\n", lastAgent.Content)
 	}
+
+	fmt.Println("--------------------------------------------------")
+	fmt.Println(" [SOCIAL PROVIDERS]")
+
+	twitterStatus := "[✗ OFFLINE]"
+	if os.Getenv("TWITTER_API_KEY") != "" && os.Getenv("TWITTER_ACCESS_TOKEN") != "" {
+		twitterStatus = "[✓ ONLINE]"
+	}
+	fmt.Printf("  Twitter:        %s\n", twitterStatus)
+
+	linkedInStatus := "[✗ OFFLINE]"
+	if os.Getenv("LINKEDIN_ACCESS_TOKEN") != "" && os.Getenv("LINKEDIN_AUTHOR_URN") != "" {
+		linkedInStatus = "[✓ ONLINE]"
+	}
+	fmt.Printf("  LinkedIn:       %s\n", linkedInStatus)
 
 	fmt.Println("--------------------------------------------------")
 	fmt.Println(" [FINANCIAL PERFORMANCE]")
