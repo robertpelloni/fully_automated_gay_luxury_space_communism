@@ -3,28 +3,25 @@
 ## 🔴 Blockers
 - [ ] **Fix Windows CGO build** — Migrate `go-sqlite3` to `modernc.org/sqlite` (pure Go).
 - [ ] **Real Social Posting** — Replace stubs in `hustle/social/post.go` with real API calls.
-- [x] **Real Web Search** — Replace mock in `hustle/research/search.go` with Tavily/Brave API. (v1.0.0-alpha.68)
 
 ## 🟠 High Priority
-- [x] Implement Git-based rollback in `orchestrator/rollback.go`. (v1.0.0-alpha.69)
-- [x] Add graceful shutdown (SIGINT handler) to persist state on exit. (v1.0.0-alpha.67)
-- [x] Enhance dashboard to show multi-agent status and iterations. (v1.0.0-alpha.69)
-- [x] Add `--dry-run` flag to social module. (v1.0.0-alpha.73)
+- [ ] **Real Trading Data** — Ensure CoinGecko fetcher is production-stable with API keys if needed.
+- [ ] **Markdown CMS** — Implement automated hosting or static site generation for the content library.
 
 ## 🟡 Medium Priority
-- [ ] Make RSS feed list configurable via `.env`.
-- [ ] Implement content topic queue for sequential generation.
-- [ ] Fix `hustle/research/report.go` compilation issues on Windows.
+- [ ] **Dashboard Styling** — Add color codes to the terminal UI (green for profit, red for error).
+- [ ] **Task History** — Log task execution times and durations to SQLite.
 
 ## 🟢 Lower Priority
-- [ ] Multi-exchange support (Binance, Kraken).
-- [ ] LLM response cache.
-- [ ] Browser extension for remote monitoring.
+- [ ] **Multi-exchange support** — Binance, Kraken plugins.
+- [ ] **LLM response cache** — Content-addressable local cache.
 
 ## ✅ Completed
-- [x] Merge Phase 3 and v1.0.0-alpha.65 stable baseline.
-- [x] OpenAI-compatible LLM provider.
-- [x] Agent Loop (Observe → Think → Act → Learn → Evaluate).
-- [x] Content Hustle module.
-- [x] Refactored Healer with LLM verification.
-- [x] Content module test coverage.
+- [x] **Dynamic RSS Management** (v1.0.0-alpha.74)
+- [x] **Scheduler Observability** (v1.0.0-alpha.74)
+- [x] **Real Research API** (v1.0.0-alpha.68)
+- [x] **Graceful Shutdown** (v1.0.0-alpha.67)
+- [x] **Git Rollback** (v1.0.0-alpha.69)
+- [x] **Mesh Wealth UI** (v1.0.0-alpha.70/75)
+- [x] **REST API Expansion** (v1.0.0-alpha.72)
+- [x] **Social Dry-Run** (v1.0.0-alpha.73)

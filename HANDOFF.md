@@ -1,4 +1,4 @@
-# Session Handoff - 1.0.0-alpha.75
+# Session Handoff - 1.0.0-alpha.76
 
 ## Summary of Changes
 This session achieved the Phase 4 milestone of "Production Hustle Operations."
@@ -17,6 +17,5 @@ This session achieved the Phase 4 milestone of "Production Hustle Operations."
 
 ## Instructions for Next Agent
 1. **Real Social API**: Integrate Twitter/LinkedIn OAuth2 and real posting logic in `hustle/social/post.go`.
-2. **Rollback Logic**: Implement Git-based rollback in `orchestrator/rollback.go`.
 3. **Windows CGO**: Migrate to `modernc.org/sqlite` to support Windows builds without gcc errors.
 4. **CI Build Step**: Re-add the build step to `.github/workflows/ci.yml` for full compilation verification.

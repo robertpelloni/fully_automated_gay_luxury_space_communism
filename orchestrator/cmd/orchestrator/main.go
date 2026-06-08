@@ -53,6 +53,7 @@ func main() {
 
 	// ── Initialize Orchestrator with REAL LLM ──
 	orch := orchestrator.NewOrchestrator()
+	orch.Load("memory.json")
 	orch.DryRun = *dryRun
 
 	// Wire up real LLM via LM Studio / OpenAI-compatible provider

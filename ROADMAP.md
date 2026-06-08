@@ -25,14 +25,21 @@
 - Agent mode CLI flag (`-agent`, `-autoplan`)
 - Refactored Healer with LLM-verification
 
-## Phase 4: Production Hustle Operations (v1.0.0-alpha.67 – v1.0.0-beta.10) 🔧 IN PROGRESS
+## Phase 4: Production Hustle Operations (v1.0.0-alpha.67 – v1.0.0-alpha.76) ✅ COMPLETE
+- [x] **Real Research API** — Tavily integration for live intelligence (v1.0.0-alpha.68)
+- [x] **Graceful Shutdown** — State persistence on SIGINT/SIGTERM (v1.0.0-alpha.67)
+- [x] **Git Rollback** — Automated recovery to stable commits (v1.0.0-alpha.69)
+- [x] **Mesh UI** — Federated profit and status observability (v1.0.0-alpha.70)
+- [x] **API Expansion** — REST endpoints for remote orchestration (v1.0.0-alpha.72)
+- [x] **Safety Modes** — Social dry-run and manual diagnostics (v1.0.0-alpha.73)
+- [x] **Dynamic RSS** — User-managed feed lists for curation (v1.0.0-alpha.74)
+- [x] **Wealth Goals** — Mesh-wide financial targets and leaderboards (v1.0.0-alpha.75)
+
+## Phase 5: Advanced Autonomy & Scaling (v1.0.0-alpha.77 – v1.0.0-beta.10) 🔧 IN PROGRESS
 - [ ] **Real Social API Integration** — Twitter/X and LinkedIn OAuth2/API calls
-- [x] **Research with real web search** — Tavily/Brave API integration (v1.0.0-alpha.68)
 - [ ] **Trading with real CoinGecko data** — verified in daemon mode with -real-prices
 - [ ] **Content output pipeline** — automated hosting/deployment of generated markdown
-- [x] **Graceful shutdown** — persist state on SIGINT, resume on restart (v1.0.0-alpha.67)
 - [ ] **Windows CGO build fix** — Migrate to `modernc.org/sqlite`
-- [x] **Real Rollback Logic** — Git-based state restoration (v1.0.0-alpha.69)
 
 ## Phase 5: Advanced Autonomy (v1.0.0-beta.11 – v1.0.0-rc.1) 📋 PLANNED
 - [ ] **Self-optimizing prompts** — A/B test prompt variations, track win rates
