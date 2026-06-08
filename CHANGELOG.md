@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.0.0-alpha.68] - 2026-06-08
+
+### Added
+- **Real Research Integration**: Implemented Tavily API support for live web search in the Research module.
+- **Enhanced UI Wiring**: Verified and finalized all interactive menu options (19 total) and dashboard components.
+
 ## [1.0.0-alpha.67] - 2026-06-08
 
 ### Added
@@ -63,7 +69,7 @@
 ## [1.0.0-alpha.58] - 2026-06-06
 ### Added
 - **Final Release Sign-off**: Verified absolute stability of the autonomous luxury protocol via comprehensive E2E integration.
-- **Production Monorepo Ready**: Finalized documentation and state synchronization for stable deployment.
+- **Production Monorepo Ready**: Finalized documentation and versioning for stable deployment.
 
 ## [1.0.0-alpha.57] - 2026-06-06
 ### Added

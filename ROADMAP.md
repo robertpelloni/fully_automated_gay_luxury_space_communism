@@ -27,7 +27,7 @@
 
 ## Phase 4: Production Hustle Operations (v1.0.0-alpha.67 – v1.0.0-beta.10) 🔧 IN PROGRESS
 - [ ] **Real Social API Integration** — Twitter/X and LinkedIn OAuth2/API calls
-- [ ] **Research with real web search** — Tavily/Brave API integration
+- [x] **Research with real web search** — Tavily/Brave API integration (v1.0.0-alpha.68)
 - [ ] **Trading with real CoinGecko data** — verified in daemon mode with -real-prices
 - [ ] **Content output pipeline** — automated hosting/deployment of generated markdown
 - [x] **Graceful shutdown** — persist state on SIGINT, resume on restart (v1.0.0-alpha.67)

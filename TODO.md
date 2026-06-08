@@ -3,7 +3,7 @@
 ## 🔴 Blockers
 - [ ] **Fix Windows CGO build** — Migrate `go-sqlite3` to `modernc.org/sqlite` (pure Go).
 - [ ] **Real Social Posting** — Replace stubs in `hustle/social/post.go` with real API calls.
-- [ ] **Real Web Search** — Replace mock in `hustle/research/search.go` with Tavily/Brave API.
+- [x] **Real Web Search** — Replace mock in `hustle/research/search.go` with Tavily/Brave API. (v1.0.0-alpha.68)
 
 ## 🟠 High Priority
 - [ ] Implement Git-based rollback in `orchestrator/rollback.go`.
