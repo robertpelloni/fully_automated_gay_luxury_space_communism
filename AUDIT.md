@@ -1,6 +1,6 @@
 # Performance Audit
 
-## v1.0.0-alpha.66
+## v1.0.0-alpha.71
 **Date:** 2026-06-07
 
 ### Core Benchmarks

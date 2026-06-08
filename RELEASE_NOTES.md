@@ -1,4 +1,4 @@
-# Release Notes - v1.0.0-alpha.68
+# Release Notes - v1.0.0-alpha.71
 
 ## "Autonomous Production Bridge" — Phase 4 Foundation
 
@@ -6,8 +6,8 @@ This release finalizes the bridge between a mock AI prototype and a production-r
 
 ### New Core Features
 
-- **Real Research Integration**: Live web search powered by the Tavily API (v1.0.0-alpha.68). Graceful fallback to mock data if API key is missing.
-- **Graceful Shutdown**: SIGINT/SIGTERM signal handling ensures system state (memory, ledger) is atomically persisted to disk on exit (v1.0.0-alpha.67).
+- **Real Research Integration**: Live web search powered by the Tavily API (v1.0.0-alpha.71). Graceful fallback to mock data if API key is missing.
+- **Graceful Shutdown**: SIGINT/SIGTERM signal handling ensures system state (memory, ledger) is atomically persisted to disk on exit (v1.0.0-alpha.71).
 - **Federated Wealth Dashboard**: Real-time visualization of collective mesh profit and individual peer health ('Luxury Space Communism').
 - **Space Communication Interface**: Interactive mesh management submenu for listing peers, broadcasting global directives, and syncing collective strategies.
 - **Autonomous Agent Observability**: Real-time agent status and iteration logs visible on the Dashboard.
@@ -27,4 +27,4 @@ This release finalizes the bridge between a mock AI prototype and a production-r
 
 ---
 
-*Previous: v1.0.0-alpha.65 — "Fully Automated Luxury Protocol" (stable monorepo)*
+*Previous: v1.0.0-alpha.71 — "Fully Automated Luxury Protocol" (stable monorepo)*
