@@ -36,10 +36,21 @@ func ShowDashboard(orch *Orchestrator) {
 	fmt.Printf("  Expenses:       $%.2f\n", orch.Ledger.TotalExpenses())
 	fmt.Printf("  NET PROFIT:     $%.2f\n", orch.Ledger.Profit())
 	fmt.Println("--------------------------------------------------")
+	fmt.Println(" [LUXURY SPACE COMMUNISM (FEDERATED WEALTH)]")
+
+	collectiveProfit := orch.Ledger.Profit()
+	meshEntries := orch.L1.Search("mesh_status")
+	for range meshEntries {
+		// Mock parsing of profit from status string if needed, for now just sum local
+		// In a real system, we'd parse the peer's profit from the status message
+		collectiveProfit += 0.0 // Placeholder for peer profit aggregation
+	}
+	fmt.Printf("  COLLECTIVE MESH PROFIT: $%.2f\n", collectiveProfit)
+
+	fmt.Println("--------------------------------------------------")
 	fmt.Println(" [MESH SWARM OVERVIEW]")
 
 	// Find mesh status entries in L1
-	meshEntries := orch.L1.Search("mesh_status")
 	if len(meshEntries) > 0 {
 		for _, e := range meshEntries {
 			fmt.Printf("  [PEER] %s\n", e.Content)

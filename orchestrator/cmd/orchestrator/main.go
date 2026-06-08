@@ -586,6 +586,7 @@ func runInteractiveMenu(orch *orchestrator.Orchestrator, protocol *orchestrator.
 			fmt.Println(" 1. List Active Mesh Peers")
 			fmt.Println(" 2. Broadcast Global Directive")
 			fmt.Println(" 3. Trigger Mesh Synchronization")
+			fmt.Println(" 4. Sync Collective Strategy")
 			fmt.Println(" r. Return to Main Menu")
 			fmt.Print("Select option: ")
 			meshInput, _ := reader.ReadString('\n')
@@ -612,6 +613,18 @@ func runInteractiveMenu(orch *orchestrator.Orchestrator, protocol *orchestrator.
 				fmt.Println("Directive broadcasted to space.")
 			case "3":
 				protocol.HandleURI("hustle://swarm?action=sync")
+			case "4":
+				fmt.Println("Broadcasting local best hustle to mesh...")
+				analysis := orch.Ledger.AnalyzeProfitability()
+				broker.Publish(orchestrator.Message{
+					ID:        fmt.Sprintf("strategy-%d", time.Now().Unix()),
+					Source:    "orchestrator-ui",
+					Type:      orchestrator.Event,
+					Topic:     "collective_strategy",
+					Payload:   "COLLECTIVE_ALPHA: " + analysis,
+					Timestamp: time.Now(),
+				})
+				fmt.Println("Strategy synced.")
 			}
 		case "q":
 			fmt.Println("Exiting...")
