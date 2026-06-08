@@ -72,6 +72,7 @@ func main() {
 	discoverer := orchestrator.NewChainDiscoverer(orch, chainManager)
 	broker := orchestrator.NewA2ABroker(orch)
 	swarm := orchestrator.NewMemorySwarm(orch, broker)
+	multiAgent := orchestrator.NewMultiAgentOrchestrator(orch, protocol, broker)
 
 	// ── Initialize Trading Module ──
 	var fetcher trading.PriceFetcher = &trading.MockPriceFetcher{}
@@ -278,6 +279,7 @@ func main() {
 	// ── API Server ──
 	if *apiPort != "" {
 		api := orchestrator.NewAPI(orch, protocol, broker, chainManager, discoverer)
+		api.MultiAgent = multiAgent
 		go api.Start(*apiPort)
 	}
 
@@ -309,7 +311,6 @@ func main() {
 		}
 
 		// Execute the plans as agents
-		multiAgent := orchestrator.NewMultiAgentOrchestrator(orch, protocol, broker)
 		for _, plan := range plans {
 			if plan.Priority == "high" || plan.Priority == "medium" {
 				// Register chain from plan steps
@@ -319,8 +320,7 @@ func main() {
 					Steps:       plan.Steps,
 				}
 				chainManager.Register(chain)
-				agent := multiAgent.AddAgent(plan.Category, 10)
-				_ = agent // will be run by RunAll
+				multiAgent.AddAgent(plan.Category, 10)
 			}
 		}
 

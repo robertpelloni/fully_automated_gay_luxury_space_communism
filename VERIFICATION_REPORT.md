@@ -1,6 +1,6 @@
 # Verification Report — Real Research Integration
 
-## Release: v1.0.0-alpha.71
+## Release: 1.0.0-alpha.72
 **Date:** 2026-06-08
 
 ### 1. Requirements Matrix

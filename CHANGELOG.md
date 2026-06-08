@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.0-alpha.72] - 2026-06-08
+
+### Added
+- **REST API Expansion**: Added 4 new endpoints for agents, content, strategy, and manual diagnostics.
+- **Manual System Diagnosis**: Added option to trigger the LLM-verified Healer loop via both CLI and API.
+- **Agent Metrics in Dashboard**: Enhanced the real-time visualization of specialized agent performance.
+- **Collective Strategy Hub**: Interactive UI and API for viewing mesh-wide shared alpha.
+
 ## [1.0.0-alpha.71] - 2026-06-08
 
 ### Changed
@@ -90,7 +98,7 @@
 ## [1.0.0-alpha.58] - 2026-06-06
 ### Added
 - **Final Release Sign-off**: Verified absolute stability of the autonomous luxury protocol via comprehensive E2E integration.
-- **Production Monorepo Ready**: Finalized all documentation and state synchronization for high-ROI autonomous execution.
+- **Production Monorepo Ready**: Finalized all documentation and versioning for stable deployment.
 
 ## [1.0.0-alpha.57] - 2026-06-06
 ### Added
