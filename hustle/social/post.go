@@ -1,9 +1,15 @@
 package social
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
-	"github.com/robertpelloni/hustle/orchestrator"
+	"io"
+	"net/http"
+	"os"
 	"time"
+
+	"github.com/robertpelloni/hustle/orchestrator"
 )
 
 type SocialPost struct {
@@ -27,15 +33,79 @@ func NewTwitterProvider() *TwitterProvider {
 	return &TwitterProvider{}
 }
 
-type LinkedInProvider struct{}
+type LinkedInProvider struct {
+	HTTPClient *http.Client
+	APIURL     string
+}
 
 func (p *LinkedInProvider) Post(orch *orchestrator.Orchestrator, platform, content string) error {
-	fmt.Printf("[LinkedIn] Posting to %s: %s\n", platform, content)
+	accessToken := os.Getenv("LINKEDIN_ACCESS_TOKEN")
+	memberID := os.Getenv("LINKEDIN_MEMBER_ID")
+
+	if accessToken == "" || memberID == "" {
+		return fmt.Errorf("missing LINKEDIN_ACCESS_TOKEN or LINKEDIN_MEMBER_ID environment variable")
+	}
+
+	apiURL := p.APIURL
+	if apiURL == "" {
+		apiURL = "https://api.linkedin.com/v2/ugcPosts"
+	}
+
+	client := p.HTTPClient
+	if client == nil {
+		client = http.DefaultClient
+	}
+
+	payload := map[string]interface{}{
+		"author":         fmt.Sprintf("urn:li:person:%s", memberID),
+		"lifecycleState": "PUBLISHED",
+		"specificContent": map[string]interface{}{
+			"com.linkedin.ugc.ShareContent": map[string]interface{}{
+				"shareCommentary": map[string]interface{}{
+					"text": content,
+				},
+				"shareMediaCategory": "NONE",
+			},
+		},
+		"visibility": map[string]interface{}{
+			"com.linkedin.ugc.MemberNetworkVisibility": "PUBLIC",
+		},
+	}
+
+	payloadBytes, err := json.Marshal(payload)
+	if err != nil {
+		return fmt.Errorf("failed to marshal linkedin payload: %v", err)
+	}
+
+	req, err := http.NewRequest("POST", apiURL, bytes.NewBuffer(payloadBytes))
+	if err != nil {
+		return fmt.Errorf("failed to create linkedin request: %v", err)
+	}
+
+	req.Header.Set("Authorization", "Bearer "+accessToken)
+	req.Header.Set("X-Restli-Protocol-Version", "2.0.0")
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return fmt.Errorf("linkedin api request failed: %v", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusCreated && resp.StatusCode != http.StatusOK {
+		bodyBytes, _ := io.ReadAll(resp.Body)
+		return fmt.Errorf("linkedin api returned status %d: %s", resp.StatusCode, string(bodyBytes))
+	}
+
+	fmt.Printf("[LinkedIn] Successfully posted to %s: %s\n", platform, content)
 	return nil
 }
 
 func NewLinkedInProvider() *LinkedInProvider {
-	return &LinkedInProvider{}
+	return &LinkedInProvider{
+		HTTPClient: &http.Client{Timeout: 10 * time.Second},
+		APIURL:     "https://api.linkedin.com/v2/ugcPosts",
+	}
 }
 
 func GenerateContent(orch *orchestrator.Orchestrator, topic string) string {
