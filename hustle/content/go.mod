@@ -1,6 +1,6 @@
 module github.com/robertpelloni/hustle/hustle/content
 
-go 1.24.3
+go 1.25.0
 
 require github.com/robertpelloni/hustle/orchestrator v0.0.0-00010101000000-000000000000
 

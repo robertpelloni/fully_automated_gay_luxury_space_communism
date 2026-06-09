@@ -166,9 +166,19 @@ func main() {
 		}
 		contentStr := p.Get("content")
 
-		var provider social.Provider = social.NewTwitterProvider()
+		var provider social.Provider
 		if strings.ToLower(platform) == "linkedin" {
-			provider = social.NewLinkedInProvider()
+			provider = social.NewLinkedInProvider(
+				os.Getenv("LINKEDIN_ACCESS_TOKEN"),
+				os.Getenv("LINKEDIN_AUTHOR_URN"),
+			)
+		} else {
+			provider = social.NewTwitterProvider(
+				os.Getenv("TWITTER_API_KEY"),
+				os.Getenv("TWITTER_API_SECRET"),
+				os.Getenv("TWITTER_ACCESS_TOKEN"),
+				os.Getenv("TWITTER_ACCESS_SECRET"),
+			)
 		}
 
 		if *dryRun {
