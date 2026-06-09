@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -125,16 +126,23 @@ func ShowDashboard(orch *Orchestrator) {
 
 	meshEntries := orch.L1.Search("mesh_status")
 	for _, e := range meshEntries {
-		if idx := strings.Index(e.Content, "PROFIT: $"); idx != -1 {
-			var p float64
-			fmt.Sscanf(e.Content[idx:], "PROFIT: $%f", &p)
-			collectiveProfit += p
+        // e.Content: "Mesh Peer peer-1 Status: Active, PROFIT: 200.00"
+        peerID := "unknown"
+        var p float64
 
-			// Extract peer ID
-			peerID := "unknown"
-			fmt.Sscanf(e.Content, "Mesh Peer %s Status:", &peerID)
-			leaderboard = append(leaderboard, peerProfit{peerID, p})
-		}
+        if idx := strings.Index(e.Content, "Peer "); idx != -1 {
+            idPart := e.Content[idx+5:]
+            if endIdx := strings.Index(idPart, " "); endIdx != -1 {
+                peerID = idPart[:endIdx]
+            }
+        }
+
+        if idx := strings.Index(e.Content, "PROFIT: $"); idx != -1 {
+            profitPart := e.Content[idx+9:]
+            p, _ = strconv.ParseFloat(profitPart, 64)
+            collectiveProfit += p
+            leaderboard = append(leaderboard, peerProfit{peerID, p})
+        }
 	}
 	collProfitColor := colorGreen
 	if collectiveProfit < 0 {
@@ -143,37 +151,70 @@ func ShowDashboard(orch *Orchestrator) {
 	fmt.Printf("  COLLECTIVE MESH PROFIT: %s$%.2f%s\n", collProfitColor, collectiveProfit, colorReset)
 
 	// Collective Goal Progress
-	meshGoal := 10000.0
+	meshGoal := orch.WealthGoal
 	progress := (collectiveProfit / meshGoal) * 100
-	if progress < 0 {
-		progress = 0
-	}
-	fmt.Printf("  MESH WEALTH GOAL: $%.2f (%s%.1f%%%s achieved)\n", meshGoal, colorCyan, progress, colorReset)
+	if progress < 0 { progress = 0 }
+
+	// ASCII Progress Bar
+	barWidth := 20
+	filled := int((progress / 100) * float64(barWidth))
+	if filled > barWidth { filled = barWidth }
+    if filled < 0 { filled = 0 }
+	bar := strings.Repeat("█", filled) + strings.Repeat("░", barWidth-filled)
+
+	fmt.Printf("  GOAL PROGRESS:  [%s] %s%.1f%%%s\n", bar, colorCyan, progress, colorReset)
+	fmt.Printf("  TARGET WEALTH:  $%.2f\n", meshGoal)
 
 	// Display leaderboard
 	sort.Slice(leaderboard, func(i, j int) bool {
 		return leaderboard[i].profit > leaderboard[j].profit
 	})
-	fmt.Print("  LEADERBOARD: ")
-	for i := 0; i < len(leaderboard) && i < 3; i++ {
-		fmt.Printf("#%d %s ($%.2f) ", i+1, leaderboard[i].id, leaderboard[i].profit)
+	fmt.Printf("\n  %sPEER LEADERBOARD:%s\n", colorBold, colorReset)
+	fmt.Printf("  %-15s %-15s %-10s\n", "RANK", "PEER ID", "PROFIT")
+	fmt.Println("  " + strings.Repeat("-", 42))
+	for i := 0; i < len(leaderboard) && i < 5; i++ {
+		rankColor := colorReset
+		if i == 0 { rankColor = colorYellow }
+		fmt.Printf("  %s#%-14d %-15s $%-10.2f%s\n", rankColor, i+1, leaderboard[i].id, leaderboard[i].profit, colorReset)
 	}
-	fmt.Println()
 
 	// Collective Alpha Insight
 	strategies := orch.L1.Search("collective_strategy")
 	if len(strategies) > 0 {
 		latest := strategies[len(strategies)-1]
-		fmt.Printf("  COLLECTIVE ALPHA: %s\n", latest.Content)
+		fmt.Printf("\n  COLLECTIVE ALPHA: %s\n", latest.Content)
 	}
 
 	fmt.Printf("%s--------------------------------------------------%s\n", colorCyan, colorReset)
-	fmt.Printf(" [MESH SWARM OVERVIEW]\n")
+	fmt.Printf(" [MESH SWARM STATUS]\n")
+	fmt.Printf("  %-20s %-15s %-10s\n", "PEER ID", "HEALTH", "VERSION")
+	fmt.Println("  " + strings.Repeat("-", 47))
 
 	// Find mesh status entries in L1
 	if len(meshEntries) > 0 {
 		for _, e := range meshEntries {
-			fmt.Printf("  %s[PEER]%s %s\n", colorBlue, colorReset, e.Content)
+            peerID := "unknown"
+            status := "unknown"
+
+            if idx := strings.Index(e.Content, "Peer "); idx != -1 {
+                idPart := e.Content[idx+5:]
+                if endIdx := strings.Index(idPart, " "); endIdx != -1 {
+                    peerID = idPart[:endIdx]
+                }
+            }
+            if idx := strings.Index(e.Content, "Status: "); idx != -1 {
+                statPart := e.Content[idx+8:]
+                if endIdx := strings.Index(statPart, ","); endIdx != -1 {
+                    status = statPart[:endIdx]
+                } else if endIdx := strings.Index(statPart, " "); endIdx != -1 {
+                    status = statPart[:endIdx]
+                }
+            }
+
+            healthColor := colorGreen
+            if status != "Active" { healthColor = colorRed }
+
+            fmt.Printf("  %-20s %s%-15s%s %-10s\n", peerID, healthColor, status, colorReset, "v1.0.0")
 		}
 	} else {
 		fmt.Println("  (No remote mesh data aggregated yet)")

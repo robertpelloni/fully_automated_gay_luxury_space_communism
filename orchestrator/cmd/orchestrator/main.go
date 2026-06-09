@@ -267,6 +267,13 @@ func main() {
 		case "provide_status":
 			data := p.Get("data")
 			swarm.HandleStatusResponse(peerID, data)
+		case "set_goal":
+			amountStr := p.Get("amount")
+			var amount float64
+			if _, err := fmt.Sscanf(amountStr, "%f", &amount); err == nil && amount > 0 {
+				orch.WealthGoal = amount
+				fmt.Printf("[Swarm] Unified Collective Wealth Goal set to $%.2f\n", amount)
+			}
 		}
 		return nil
 	})
@@ -317,11 +324,13 @@ func main() {
 		agent := orchestrator.NewAgentLoop(orch, protocol, broker, *agentType)
 		agent.State.MaxIter = *agentIter
 		fmt.Printf("[Agent] 🤖 Launching autonomous agent: %s (%d iterations)\n", *agentType, *agentIter)
-		if err := agent.Run(); err != nil {
-			fmt.Printf("[Agent] ❌ Agent failed: %v\n", err)
-			os.Exit(1)
-		}
-		return
+
+		// Run agent in a goroutine so signal handling works
+		go func() {
+			if err := agent.Run(); err != nil {
+				fmt.Printf("[Agent] ❌ Agent failed: %v\n", err)
+			}
+		}()
 	}
 
 	// ── Auto-Plan Mode (NEW): LLM generates strategic plan and executes it ──
@@ -330,43 +339,40 @@ func main() {
 		plans, err := orchestrator.PlanHustles(orch)
 		if err != nil {
 			fmt.Printf("[AutoPlan] ❌ Planning failed: %v\n", err)
-			os.Exit(1)
-		}
-
-		fmt.Printf("[AutoPlan] 📋 Generated %d hustle plans:\n", len(plans))
-		for i, plan := range plans {
-			fmt.Printf("  %d. [%s] %s — %s (every %d min, priority: %s)\n",
-				i+1, plan.Category, plan.Name, plan.Description, plan.IntervalMin, plan.Priority)
-		}
-
-		// Execute the plans as agents
-		for _, plan := range plans {
-			if plan.Priority == "high" || plan.Priority == "medium" {
-				// Register chain from plan steps
-				chain := &orchestrator.Chain{
-					Name:        plan.Name,
-					Description: plan.Description,
-					Steps:       plan.Steps,
-				}
-				chainManager.Register(chain)
-				multiAgent.AddAgent(plan.Category, 10)
+		} else {
+			fmt.Printf("[AutoPlan] 📋 Generated %d hustle plans:\n", len(plans))
+			for i, plan := range plans {
+				fmt.Printf("  %d. [%s] %s — %s (every %d min, priority: %s)\n",
+					i+1, plan.Category, plan.Name, plan.Description, plan.IntervalMin, plan.Priority)
 			}
-		}
 
-		multiAgent.RunAll()
-		return
+			// Execute the plans as agents
+			for _, plan := range plans {
+				if plan.Priority == "high" || plan.Priority == "medium" {
+					// Register chain from plan steps
+					chain := &orchestrator.Chain{
+						Name:        plan.Name,
+						Description: plan.Description,
+						Steps:       plan.Steps,
+					}
+					chainManager.Register(chain)
+					multiAgent.AddAgent(plan.Category, 10)
+				}
+			}
+			go multiAgent.RunAll()
+		}
 	}
 
 	// ── Interactive Mode ──
 	if *interactive {
 		runInteractiveMenu(orch, protocol, broker, traderModule, contentModule, version)
+		orch.Shutdown()
 		return
 	}
 
 	// ── Dashboard Mode ──
 	if *dashboard {
-		orchestrator.StartLiveDashboard(orch)
-		return
+		go orchestrator.StartLiveDashboard(orch)
 	}
 
 	// ── Daemon Mode ──
@@ -422,8 +428,7 @@ func main() {
 		})
 
 		fmt.Println("Orchestrator running in Daemon mode.")
-		scheduler.Start()
-		return
+		go scheduler.Start()
 	}
 
 	// ── Sync Mode ──
@@ -448,15 +453,13 @@ func main() {
 		}
 	}
 
-	// Wait for shutdown signal or exit if not in long-running mode
-	if *apiPort != "" || *daemon || *dashboard || *agentMode {
+	// Wait for shutdown signal if any long-running mode is active
+	if *apiPort != "" || *daemon || *dashboard || *agentMode || *autoPlan {
 		fmt.Println("Orchestrator running. Press Ctrl+C to terminate.")
-		select {
-		case sig := <-sigChan:
-			fmt.Printf("\n[Main] Received signal: %v\n", sig)
-			orch.Shutdown()
-			os.Exit(0)
-		}
+		sig := <-sigChan
+		fmt.Printf("\n[Main] Received signal: %v\n", sig)
+		orch.Shutdown()
+		os.Exit(0)
 	}
 
 	// Real-time status reporting with financial metrics
@@ -609,6 +612,7 @@ func runInteractiveMenu(orch *orchestrator.Orchestrator, protocol *orchestrator.
 		fmt.Println("20. 🆕 Manual System Diagnosis")
 		fmt.Println("21. 🆕 RSS Feed Management")
 		fmt.Println("22. 🆕 View Task History (SQLite)")
+		fmt.Println("23. 🆕 Configure Collective Wealth Goal")
 		fmt.Println(" q. Quit")
 		fmt.Print("Select an option: ")
 
@@ -753,6 +757,19 @@ func runInteractiveMenu(orch *orchestrator.Orchestrator, protocol *orchestrator.
 			orchestrator.ShowTaskHistory(orch)
 			fmt.Println("\nPress Enter to return to menu...")
 			reader.ReadString('\n')
+		case "23":
+			fmt.Printf("Current Wealth Goal: $%.2f\n", orch.WealthGoal)
+			fmt.Print("Enter new goal amount: ")
+			goalStr, _ := reader.ReadString('\n')
+			goalStr = strings.TrimSpace(goalStr)
+			var newGoal float64
+			if _, err := fmt.Sscanf(goalStr, "%f", &newGoal); err == nil && newGoal > 0 {
+				orch.WealthGoal = newGoal
+				fmt.Printf("Collective Wealth Goal updated to $%.2f. Broadcasting to mesh...\n", newGoal)
+				protocol.HandleURI(fmt.Sprintf("hustle://swarm?action=set_goal&amount=%.2f", newGoal))
+			} else {
+				fmt.Println("Invalid amount. Goal unchanged.")
+			}
 		case "q":
 			fmt.Println("Exiting...")
 			return

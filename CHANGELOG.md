@@ -1,3 +1,11 @@
+## [1.0.0-alpha.79] - 2026-06-09
+
+### Added
+- **Configurable Wealth Goals**: Added support for setting and synchronizing a collective wealth target across the federated mesh.
+- **Luxury Space Communism UI Polish**: Implemented a visual ASCII progress bar for the collective goal and a structured peer leaderboard with top-performer highlighting.
+- **Swarm Protocol Expansion**: New `set_goal` action enables mesh-wide synchronization of financial targets.
+- **Robust Peer Data Parsing**: Enhanced the dashboard extraction logic to more reliably process peer status and profit data from mesh communication logs.
+
 ## [1.0.0-alpha.78] - 2026-06-09
 
 ### Added
