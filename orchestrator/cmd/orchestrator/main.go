@@ -324,13 +324,11 @@ func main() {
 		agent := orchestrator.NewAgentLoop(orch, protocol, broker, *agentType)
 		agent.State.MaxIter = *agentIter
 		fmt.Printf("[Agent] 🤖 Launching autonomous agent: %s (%d iterations)\n", *agentType, *agentIter)
-
-		// Run agent in a goroutine so signal handling works
-		go func() {
-			if err := agent.Run(); err != nil {
-				fmt.Printf("[Agent] ❌ Agent failed: %v\n", err)
-			}
-		}()
+		if err := agent.Run(); err != nil {
+			fmt.Printf("[Agent] ❌ Agent failed: %v\n", err)
+			os.Exit(1)
+		}
+		return
 	}
 
 	// ── Auto-Plan Mode (NEW): LLM generates strategic plan and executes it ──
@@ -339,40 +337,43 @@ func main() {
 		plans, err := orchestrator.PlanHustles(orch)
 		if err != nil {
 			fmt.Printf("[AutoPlan] ❌ Planning failed: %v\n", err)
-		} else {
-			fmt.Printf("[AutoPlan] 📋 Generated %d hustle plans:\n", len(plans))
-			for i, plan := range plans {
-				fmt.Printf("  %d. [%s] %s — %s (every %d min, priority: %s)\n",
-					i+1, plan.Category, plan.Name, plan.Description, plan.IntervalMin, plan.Priority)
-			}
-
-			// Execute the plans as agents
-			for _, plan := range plans {
-				if plan.Priority == "high" || plan.Priority == "medium" {
-					// Register chain from plan steps
-					chain := &orchestrator.Chain{
-						Name:        plan.Name,
-						Description: plan.Description,
-						Steps:       plan.Steps,
-					}
-					chainManager.Register(chain)
-					multiAgent.AddAgent(plan.Category, 10)
-				}
-			}
-			go multiAgent.RunAll()
+			os.Exit(1)
 		}
+
+		fmt.Printf("[AutoPlan] 📋 Generated %d hustle plans:\n", len(plans))
+		for i, plan := range plans {
+			fmt.Printf("  %d. [%s] %s — %s (every %d min, priority: %s)\n",
+				i+1, plan.Category, plan.Name, plan.Description, plan.IntervalMin, plan.Priority)
+		}
+
+		// Execute the plans as agents
+		for _, plan := range plans {
+			if plan.Priority == "high" || plan.Priority == "medium" {
+				// Register chain from plan steps
+				chain := &orchestrator.Chain{
+					Name:        plan.Name,
+					Description: plan.Description,
+					Steps:       plan.Steps,
+				}
+				chainManager.Register(chain)
+				multiAgent.AddAgent(plan.Category, 10)
+			}
+		}
+
+		multiAgent.RunAll()
+		return
 	}
 
 	// ── Interactive Mode ──
 	if *interactive {
 		runInteractiveMenu(orch, protocol, broker, traderModule, contentModule, version)
-		orch.Shutdown()
 		return
 	}
 
 	// ── Dashboard Mode ──
 	if *dashboard {
-		go orchestrator.StartLiveDashboard(orch)
+		orchestrator.StartLiveDashboard(orch)
+		return
 	}
 
 	// ── Daemon Mode ──
@@ -428,7 +429,8 @@ func main() {
 		})
 
 		fmt.Println("Orchestrator running in Daemon mode.")
-		go scheduler.Start()
+		scheduler.Start()
+		return
 	}
 
 	// ── Sync Mode ──
@@ -453,13 +455,15 @@ func main() {
 		}
 	}
 
-	// Wait for shutdown signal if any long-running mode is active
-	if *apiPort != "" || *daemon || *dashboard || *agentMode || *autoPlan {
+	// Wait for shutdown signal or exit if not in long-running mode
+	if *apiPort != "" || *daemon || *dashboard || *agentMode {
 		fmt.Println("Orchestrator running. Press Ctrl+C to terminate.")
-		sig := <-sigChan
-		fmt.Printf("\n[Main] Received signal: %v\n", sig)
-		orch.Shutdown()
-		os.Exit(0)
+		select {
+		case sig := <-sigChan:
+			fmt.Printf("\n[Main] Received signal: %v\n", sig)
+			orch.Shutdown()
+			os.Exit(0)
+		}
 	}
 
 	// Real-time status reporting with financial metrics

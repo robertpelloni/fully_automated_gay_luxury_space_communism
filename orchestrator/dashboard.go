@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"sort"
-	"strconv"
 	"strings"
 	"time"
 )
@@ -126,23 +125,16 @@ func ShowDashboard(orch *Orchestrator) {
 
 	meshEntries := orch.L1.Search("mesh_status")
 	for _, e := range meshEntries {
-        // e.Content: "Mesh Peer peer-1 Status: Active, PROFIT: 200.00"
-        peerID := "unknown"
-        var p float64
+		if idx := strings.Index(e.Content, "PROFIT: $"); idx != -1 {
+			var p float64
+			fmt.Sscanf(e.Content[idx:], "PROFIT: $%f", &p)
+			collectiveProfit += p
 
-        if idx := strings.Index(e.Content, "Peer "); idx != -1 {
-            idPart := e.Content[idx+5:]
-            if endIdx := strings.Index(idPart, " "); endIdx != -1 {
-                peerID = idPart[:endIdx]
-            }
-        }
-
-        if idx := strings.Index(e.Content, "PROFIT: $"); idx != -1 {
-            profitPart := e.Content[idx+9:]
-            p, _ = strconv.ParseFloat(profitPart, 64)
-            collectiveProfit += p
-            leaderboard = append(leaderboard, peerProfit{peerID, p})
-        }
+			// Extract peer ID
+			peerID := "unknown"
+			fmt.Sscanf(e.Content, "Mesh Peer %s Status:", &peerID)
+			leaderboard = append(leaderboard, peerProfit{peerID, p})
+		}
 	}
 	collProfitColor := colorGreen
 	if collectiveProfit < 0 {
@@ -159,7 +151,6 @@ func ShowDashboard(orch *Orchestrator) {
 	barWidth := 20
 	filled := int((progress / 100) * float64(barWidth))
 	if filled > barWidth { filled = barWidth }
-    if filled < 0 { filled = 0 }
 	bar := strings.Repeat("█", filled) + strings.Repeat("░", barWidth-filled)
 
 	fmt.Printf("  GOAL PROGRESS:  [%s] %s%.1f%%%s\n", bar, colorCyan, progress, colorReset)
@@ -182,7 +173,7 @@ func ShowDashboard(orch *Orchestrator) {
 	strategies := orch.L1.Search("collective_strategy")
 	if len(strategies) > 0 {
 		latest := strategies[len(strategies)-1]
-		fmt.Printf("\n  COLLECTIVE ALPHA: %s\n", latest.Content)
+		fmt.Printf("  COLLECTIVE ALPHA: %s\n", latest.Content)
 	}
 
 	fmt.Printf("%s--------------------------------------------------%s\n", colorCyan, colorReset)
@@ -193,28 +184,16 @@ func ShowDashboard(orch *Orchestrator) {
 	// Find mesh status entries in L1
 	if len(meshEntries) > 0 {
 		for _, e := range meshEntries {
-            peerID := "unknown"
-            status := "unknown"
+			// Extract data from "Mesh Peer test-peer Status: Active, PROFIT: $500.50"
+			peerID := "unknown"
+			status := "unknown"
+			fmt.Sscanf(e.Content, "Mesh Peer %s Status: %s", &peerID, &status)
+			status = strings.TrimSuffix(status, ",")
 
-            if idx := strings.Index(e.Content, "Peer "); idx != -1 {
-                idPart := e.Content[idx+5:]
-                if endIdx := strings.Index(idPart, " "); endIdx != -1 {
-                    peerID = idPart[:endIdx]
-                }
-            }
-            if idx := strings.Index(e.Content, "Status: "); idx != -1 {
-                statPart := e.Content[idx+8:]
-                if endIdx := strings.Index(statPart, ","); endIdx != -1 {
-                    status = statPart[:endIdx]
-                } else if endIdx := strings.Index(statPart, " "); endIdx != -1 {
-                    status = statPart[:endIdx]
-                }
-            }
+			healthColor := colorGreen
+			if status != "Active" { healthColor = colorRed }
 
-            healthColor := colorGreen
-            if status != "Active" { healthColor = colorRed }
-
-            fmt.Printf("  %-20s %s%-15s%s %-10s\n", peerID, healthColor, status, colorReset, "v1.0.0")
+			fmt.Printf("  %-20s %s%-15s%s %-10s\n", peerID, healthColor, status, colorReset, "v1.0.0")
 		}
 	} else {
 		fmt.Println("  (No remote mesh data aggregated yet)")
