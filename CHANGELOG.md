@@ -1,3 +1,17 @@
+## [1.0.0-alpha.78] - 2026-06-09
+
+### Added
+- **Polished Terminal Dashboard**: Integrated ANSI color styling for improved visibility of machine status, profit metrics, and provider health.
+- **Unified Task Observability**: Dashboard now displays a "RECENT TASK LOG (SQL)" section, fetching the latest outcomes directly from the SQLite store.
+- **Hardened Content Prompting**: Refactored the prompt generation logic to ensure robust argument alignment and prevent malformed LLM instructions.
+- **Stable Monorepo Dependency Alignment**: Standardized Go 1.25 across all modules to resolve modern dependency requirements and ensure build stability.
+
+# 1.0.0-alpha.78
+- Polished Terminal Dashboard with ANSI colors and Real-time Status.
+- Integrated SQLite Task History into the main UI.
+- Hardened Content module prompt generation logic.
+- Optimized environment and dependency alignment.
+
 # 1.0.0-alpha.77
 - Migrated to pure Go SQLite driver (`modernc.org/sqlite`) for Windows CGO compatibility.
 - Implemented Task Execution History logging to SQLite.

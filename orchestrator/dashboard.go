@@ -8,16 +8,26 @@ import (
 	"time"
 )
 
+const (
+	colorReset  = "\033[0m"
+	colorRed    = "\033[31m"
+	colorGreen  = "\033[32m"
+	colorYellow = "\033[33m"
+	colorBlue   = "\033[34m"
+	colorCyan   = "\033[36m"
+	colorBold   = "\033[1m"
+)
+
 // ShowDashboard renders a static view of the current machine state
 func ShowDashboard(orch *Orchestrator) {
 	fmt.Println("\033[H\033[2J") // Clear terminal
-	fmt.Println("==================================================")
-	fmt.Println("          AI HUSTLE MACHINE DASHBOARD             ")
+	fmt.Printf("%s==================================================%s\n", colorCyan, colorReset)
+	fmt.Printf("%s%s          AI HUSTLE MACHINE DASHBOARD             %s\n", colorBold, colorYellow, colorReset)
 	fmt.Println("   (Real-time visualization of machine health)    ")
 	if orch.DryRun {
-		fmt.Println("      ⚠️  [DRY-RUN MODE ACTIVE: NO POSTING]       ")
+		fmt.Printf("      %s⚠️  [DRY-RUN MODE ACTIVE: NO POSTING]%s       \n", colorRed, colorReset)
 	}
-	fmt.Println("==================================================")
+	fmt.Printf("%s==================================================%s\n", colorCyan, colorReset)
 	fmt.Printf(" [SYSTEM TIME]    %s\n", time.Now().Format("15:04:05"))
 	fmt.Printf(" [MEMORY STATE]   L1:%d, L2:%d, L3:%d entries\n", len(orch.L1.Entries), len(orch.L2.Entries), len(orch.L3.Entries))
 
@@ -75,28 +85,34 @@ func ShowDashboard(orch *Orchestrator) {
 		fmt.Printf(" [LAST ACTION]    %s\n", lastAgent.Content)
 	}
 
-	fmt.Println("--------------------------------------------------")
-	fmt.Println(" [SOCIAL PROVIDERS]")
+	fmt.Printf("%s--------------------------------------------------%s\n", colorCyan, colorReset)
+	fmt.Printf(" [SOCIAL PROVIDERS]\n")
 
-	twitterStatus := "[✗ OFFLINE]"
+	twitterStatus := fmt.Sprintf("%s[✗ OFFLINE]%s", colorRed, colorReset)
 	if os.Getenv("TWITTER_API_KEY") != "" && os.Getenv("TWITTER_ACCESS_TOKEN") != "" {
-		twitterStatus = "[✓ ONLINE]"
+		twitterStatus = fmt.Sprintf("%s[✓ ONLINE]%s", colorGreen, colorReset)
 	}
 	fmt.Printf("  Twitter:        %s\n", twitterStatus)
 
-	linkedInStatus := "[✗ OFFLINE]"
+	linkedInStatus := fmt.Sprintf("%s[✗ OFFLINE]%s", colorRed, colorReset)
 	if os.Getenv("LINKEDIN_ACCESS_TOKEN") != "" && os.Getenv("LINKEDIN_AUTHOR_URN") != "" {
-		linkedInStatus = "[✓ ONLINE]"
+		linkedInStatus = fmt.Sprintf("%s[✓ ONLINE]%s", colorGreen, colorReset)
 	}
 	fmt.Printf("  LinkedIn:       %s\n", linkedInStatus)
 
-	fmt.Println("--------------------------------------------------")
-	fmt.Println(" [FINANCIAL PERFORMANCE]")
+	fmt.Printf("%s--------------------------------------------------%s\n", colorCyan, colorReset)
+	fmt.Printf(" [%sFINANCIAL PERFORMANCE%s]\n", colorBold, colorReset)
 	fmt.Printf("  Revenue:        $%.2f\n", orch.Ledger.TotalRevenue())
 	fmt.Printf("  Expenses:       $%.2f\n", orch.Ledger.TotalExpenses())
-	fmt.Printf("  NET PROFIT:     $%.2f\n", orch.Ledger.Profit())
-	fmt.Println("--------------------------------------------------")
-	fmt.Println(" [LUXURY SPACE COMMUNISM (FEDERATED WEALTH)]")
+
+	profitColor := colorGreen
+	if orch.Ledger.Profit() < 0 {
+		profitColor = colorRed
+	}
+	fmt.Printf("  %sNET PROFIT:     $%.2f%s\n", profitColor, orch.Ledger.Profit(), colorReset)
+
+	fmt.Printf("%s--------------------------------------------------%s\n", colorCyan, colorReset)
+	fmt.Printf(" [%s%sLUXURY SPACE COMMUNISM (FEDERATED WEALTH)%s]\n", colorBold, colorYellow, colorReset)
 
 	type peerProfit struct {
 		id     string
@@ -120,13 +136,19 @@ func ShowDashboard(orch *Orchestrator) {
 			leaderboard = append(leaderboard, peerProfit{peerID, p})
 		}
 	}
-	fmt.Printf("  COLLECTIVE MESH PROFIT: $%.2f\n", collectiveProfit)
+	collProfitColor := colorGreen
+	if collectiveProfit < 0 {
+		collProfitColor = colorRed
+	}
+	fmt.Printf("  COLLECTIVE MESH PROFIT: %s$%.2f%s\n", collProfitColor, collectiveProfit, colorReset)
 
 	// Collective Goal Progress
 	meshGoal := 10000.0
 	progress := (collectiveProfit / meshGoal) * 100
-	if progress < 0 { progress = 0 }
-	fmt.Printf("  MESH WEALTH GOAL: $%.2f (%.1f%% achieved)\n", meshGoal, progress)
+	if progress < 0 {
+		progress = 0
+	}
+	fmt.Printf("  MESH WEALTH GOAL: $%.2f (%s%.1f%%%s achieved)\n", meshGoal, colorCyan, progress, colorReset)
 
 	// Display leaderboard
 	sort.Slice(leaderboard, func(i, j int) bool {
@@ -145,20 +167,20 @@ func ShowDashboard(orch *Orchestrator) {
 		fmt.Printf("  COLLECTIVE ALPHA: %s\n", latest.Content)
 	}
 
-	fmt.Println("--------------------------------------------------")
-	fmt.Println(" [MESH SWARM OVERVIEW]")
+	fmt.Printf("%s--------------------------------------------------%s\n", colorCyan, colorReset)
+	fmt.Printf(" [MESH SWARM OVERVIEW]\n")
 
 	// Find mesh status entries in L1
 	if len(meshEntries) > 0 {
 		for _, e := range meshEntries {
-			fmt.Printf("  [PEER] %s\n", e.Content)
+			fmt.Printf("  %s[PEER]%s %s\n", colorBlue, colorReset, e.Content)
 		}
 	} else {
 		fmt.Println("  (No remote mesh data aggregated yet)")
 	}
 
-	fmt.Println("--------------------------------------------------")
-	fmt.Println(" [SPACE COMMS (MESH TRAFFIC)]")
+	fmt.Printf("%s--------------------------------------------------%s\n", colorCyan, colorReset)
+	fmt.Printf(" [SPACE COMMS (MESH TRAFFIC)]\n")
 
 	// Filter for mesh-specific messages
 	meshMsgs := orch.L1.Search("mesh")
@@ -173,8 +195,28 @@ func ShowDashboard(orch *Orchestrator) {
 		fmt.Println("  (No active space communication detected)")
 	}
 
-	fmt.Println("--------------------------------------------------")
-	fmt.Println(" [RECENT ACTIVITY LOG]")
+	fmt.Printf("%s--------------------------------------------------%s\n", colorCyan, colorReset)
+	fmt.Printf(" [RECENT TASK LOG (SQL)]\n")
+	if orch.DB != nil {
+		history, _ := orch.DB.GetTaskHistory(3)
+		if len(history) > 0 {
+			for _, h := range history {
+				duration := time.Duration(h.DurationMs) * time.Millisecond
+				statusColor := colorGreen
+				if h.Status != "success" {
+					statusColor = colorRed
+				}
+				fmt.Printf("  [%s] %s (%v) - %s%s%s\n", h.Timestamp.Format("15:04"), h.TaskID, duration, statusColor, h.Status, colorReset)
+			}
+		} else {
+			fmt.Println("  (No task history logged yet)")
+		}
+	} else {
+		fmt.Printf("  %s(Database offline)%s\n", colorRed, colorReset)
+	}
+
+	fmt.Printf("%s--------------------------------------------------%s\n", colorCyan, colorReset)
+	fmt.Printf(" [RECENT ACTIVITY LOG (L1)]\n")
 
 	// Show last 3 L1 entries as events (excluding mesh_status to avoid duplication)
 	count := 0
