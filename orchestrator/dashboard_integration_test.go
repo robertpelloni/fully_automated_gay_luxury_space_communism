@@ -14,7 +14,6 @@ func TestDashboardSocialStatus(t *testing.T) {
 		L2: L2Memory{Entries: []MemoryEntry{}},
 		L3: L3Memory{Entries: []MemoryEntry{}},
 		Ledger: Ledger{Transactions: []Transaction{}},
-		WealthGoal: 1000.0,
 	}
 
 	// Helper to capture stdout
@@ -42,8 +41,11 @@ func TestDashboardSocialStatus(t *testing.T) {
 		ShowDashboard(orch)
 	})
 
-	if !strings.Contains(output, "[✗ OFFLINE]") {
-		t.Errorf("Expected OFFLINE status, got \n%s", output)
+	if !strings.Contains(output, "Twitter:        [✗ OFFLINE]") {
+		t.Errorf("Expected Twitter OFFLINE, got \n%s", output)
+	}
+	if !strings.Contains(output, "LinkedIn:       [✗ OFFLINE]") {
+		t.Errorf("Expected LinkedIn OFFLINE, got \n%s", output)
 	}
 
 	// Test Online Status
@@ -62,7 +64,10 @@ func TestDashboardSocialStatus(t *testing.T) {
 		ShowDashboard(orch)
 	})
 
-	if !strings.Contains(output, "[✓ ONLINE]") {
-		t.Errorf("Expected ONLINE status, got \n%s", output)
+	if !strings.Contains(output, "Twitter:        [✓ ONLINE]") {
+		t.Errorf("Expected Twitter ONLINE, got \n%s", output)
+	}
+	if !strings.Contains(output, "LinkedIn:       [✓ ONLINE]") {
+		t.Errorf("Expected LinkedIn ONLINE, got \n%s", output)
 	}
 }

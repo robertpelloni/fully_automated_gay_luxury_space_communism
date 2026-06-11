@@ -144,17 +144,23 @@ func ShowDashboard(orch *Orchestrator) {
 
 	// Collective Goal Progress
 	meshGoal := orch.WealthGoal
-	if meshGoal <= 0 { meshGoal = 1 } // Prevent division by zero
 	progress := (collectiveProfit / meshGoal) * 100
 	if progress < 0 { progress = 0 }
+<<<<<<< HEAD
 
+=======
+
+>>>>>>> origin/feat/v1.0.0-alpha.66-intelligent-luxury-integration-5942242806919700290
 	// ASCII Progress Bar
 	barWidth := 20
 	filled := int((progress / 100) * float64(barWidth))
-	if filled < 0 { filled = 0 }
 	if filled > barWidth { filled = barWidth }
 	bar := strings.Repeat("█", filled) + strings.Repeat("░", barWidth-filled)
+<<<<<<< HEAD
 
+=======
+
+>>>>>>> origin/feat/v1.0.0-alpha.66-intelligent-luxury-integration-5942242806919700290
 	fmt.Printf("  GOAL PROGRESS:  [%s] %s%.1f%%%s\n", bar, colorCyan, progress, colorReset)
 	fmt.Printf("  TARGET WEALTH:  $%.2f\n", meshGoal)
 
@@ -191,10 +197,17 @@ func ShowDashboard(orch *Orchestrator) {
 			status := "unknown"
 			fmt.Sscanf(e.Content, "Mesh Peer %s Status: %s", &peerID, &status)
 			status = strings.TrimSuffix(status, ",")
+<<<<<<< HEAD
 
 			healthColor := colorGreen
 			if status != "Active" { healthColor = colorRed }
 
+=======
+
+			healthColor := colorGreen
+			if status != "Active" { healthColor = colorRed }
+
+>>>>>>> origin/feat/v1.0.0-alpha.66-intelligent-luxury-integration-5942242806919700290
 			fmt.Printf("  %-20s %s%-15s%s %-10s\n", peerID, healthColor, status, colorReset, "v1.0.0")
 		}
 	} else {
