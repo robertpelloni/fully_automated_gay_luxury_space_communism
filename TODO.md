@@ -14,7 +14,7 @@
 
 ## 🟢 Lower Priority
 - [ ] **Multi-exchange support** — Binance, Kraken plugins.
-- [x] **LLM response cache** — Content-addressable local cache (v1.0.0-alpha.82).
+- [ ] **LLM response cache** — Content-addressable local cache.
 
 ## ✅ Completed
 - [x] **Dynamic RSS Management** (v1.0.0-alpha.74)

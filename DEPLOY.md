@@ -2,9 +2,10 @@
 
 ## Prerequisites
 
-- **Go 1.25.0** (Required toolchain)
+- **Go 1.24.3** (Required toolchain)
 - **LM Studio** (Recommended) or **Ollama** for free local LLM inference
 - **A loaded model** in LM Studio (e.g., `gemma-4-26b-it`) or Ollama (e.g., `gemma3:27b`)
+- **gcc** (Required for `go-sqlite3` CGO)
 
 ## Quick Start
 
@@ -32,7 +33,7 @@ go work sync
 ./build.sh
 ```
 
-> **CGO-Free SQLite**: The system uses `modernc.org/sqlite` (pure Go), which eliminates the need for `gcc` and CGO, ensuring full compatibility with Windows and simplified cross-compilation.
+> **Windows CGO Note**: If `build.sh` fails with `cgo: cannot parse gcc output`, the `go-sqlite3` driver has a known incompatibility with some gcc versions on Windows. Workaround: `set CGO_ENABLED=0` and the system will skip SQLite persistence (uses in-memory only). A pure-Go SQLite alternative (`modernc.org/sqlite`) is planned.
 
 ### 3. Verify LLM Connection
 

@@ -22,14 +22,11 @@ func TestDashboardSocialStatus(t *testing.T) {
 		Ledger: Ledger{Transactions: []Transaction{}},
 	}
 
-	// Helper to capture stdout
 	captureOutput := func(f func()) string {
 		old := os.Stdout
 		r, w, _ := os.Pipe()
 		os.Stdout = w
-
 		f()
-
 		w.Close()
 		os.Stdout = old
 		var buf bytes.Buffer
@@ -37,15 +34,12 @@ func TestDashboardSocialStatus(t *testing.T) {
 		return buf.String()
 	}
 
-	// Test Offline Status
 	os.Unsetenv("TWITTER_API_KEY")
 	os.Unsetenv("TWITTER_ACCESS_TOKEN")
 	os.Unsetenv("LINKEDIN_ACCESS_TOKEN")
 	os.Unsetenv("LINKEDIN_AUTHOR_URN")
 
-	output := captureOutput(func() {
-		ShowDashboard(orch)
-	})
+	output := captureOutput(func() { ShowDashboard(orch) })
 	cleanOutput := stripANSI(output)
 
 	if !strings.Contains(cleanOutput, "Twitter:        [✗ OFFLINE]") {
@@ -55,7 +49,6 @@ func TestDashboardSocialStatus(t *testing.T) {
 		t.Errorf("Expected LinkedIn OFFLINE, got \n%s", cleanOutput)
 	}
 
-	// Test Online Status
 	os.Setenv("TWITTER_API_KEY", "test")
 	os.Setenv("TWITTER_ACCESS_TOKEN", "test")
 	os.Setenv("LINKEDIN_ACCESS_TOKEN", "test")
@@ -67,9 +60,7 @@ func TestDashboardSocialStatus(t *testing.T) {
 		os.Unsetenv("LINKEDIN_AUTHOR_URN")
 	}()
 
-	output = captureOutput(func() {
-		ShowDashboard(orch)
-	})
+	output = captureOutput(func() { ShowDashboard(orch) })
 	cleanOutput = stripANSI(output)
 
 	if !strings.Contains(cleanOutput, "Twitter:        [✓ ONLINE]") {

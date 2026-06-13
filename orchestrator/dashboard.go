@@ -3,7 +3,6 @@ package orchestrator
 import (
 	"fmt"
 	"os"
-	"sort"
 	"strings"
 	"time"
 )
@@ -116,8 +115,6 @@ func ShowDashboard(orch *Orchestrator) {
 	bar := strings.Repeat("█", filled) + strings.Repeat("░", barWidth-filled)
 	fmt.Printf("  GOAL PROGRESS:  [%s] %s%.1f%%%s\n", bar, colorCyan, progress, colorReset)
 	fmt.Printf("  TARGET WEALTH:  $%.2f\n", meshGoal)
-
-	sort.Slice(meshEntries, func(i, j int) bool { return i < j }) // Just for using sort
 
 	fmt.Println("==================================================")
 	fmt.Println(" Tip: Use 'orchestrator -interactive' for controls.")
