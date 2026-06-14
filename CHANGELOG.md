@@ -18,6 +18,13 @@
 - **Swarm Protocol Expansion**: New `set_goal` action enables mesh-wide synchronization of financial targets.
 - **Robust Peer Data Parsing**: Enhanced the dashboard extraction logic to more reliably process peer status and profit data from mesh communication logs.
 
+## [1.0.0-alpha.89] - 2026-06-13
+
+### Added
+- **Interactive Input Forms**: User queries/topics/symbols for hustle modules.
+- **Memory UI**: Semantic and keyword search within the interactive menu.
+- **System Maintenance**: Manual gallery refresh and self-healing triggers.
+
 ## [1.0.0-alpha.88] - 2026-06-12
 
 ### Added
