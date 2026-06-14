@@ -7,7 +7,7 @@
 ## 🟠 High Priority
 - [x] **Real Trading Data** (v1.0.0-alpha.83) — CoinGecko fetcher production-hardened with caching, retry, rate-limit handling, and API key support.
 - [x] **Markdown CMS** (v1.0.0-alpha.82) — Static site generator in `hustle/content/deploy.go` with RSS feed, responsive CSS, and local preview server.
-- [ ] **Content Deployment Pipeline** — Automated deploy to WordPress or GitHub Pages from the content output.
+- [x] **Content Deployment Pipeline** — Automated deploy to WordPress or GitHub Pages from the content output.
 
 ## 🟡 Medium Priority
 - [x] **Dashboard Styling** (v1.0.0-alpha.78) — Add color codes to the terminal UI (green for profit, red for error).
