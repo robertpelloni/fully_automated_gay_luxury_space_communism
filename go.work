@@ -6,5 +6,6 @@ use (
 	./hustle/research
 	./hustle/social
 	./hustle/trading
+	./hustle/publisher
 	./orchestrator
 )

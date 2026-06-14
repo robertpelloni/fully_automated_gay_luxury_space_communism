@@ -1,3 +1,18 @@
+## [1.0.0-alpha.82] - 2026-06-13
+
+### Fixed
+- **TODO.md Accuracy**: Marked "Real Social Posting" as completed — integrations were already implemented in previous phase but TODO was never updated.
+
+### Added
+- **Twitter API Integration**: Full OAuth1 authentication via `github.com/dghubble/oauth1`, real HTTP POST to `api.twitter.com/2/tweets`, DryRun support, structured error handling.
+- **LinkedIn API Integration**: Bearer token auth targeting UGC Posts API v2, proper JSON payload with author, visibility, and lifecycle state, DryRun support.
+- **Content Generation**: LLM-based social post generation with fallback for offline mode.
+- **Test Coverage**: Unit tests (`post_test.go`) and integration tests (`post_integration_test.go`) for social providers.
+
+### Changed
+- **Version Increment**: Bumped to v1.0.0-alpha.82.
+- **Unified State**: Confirmed monorepo consistency across all modules.
+
 ## [1.0.0-alpha.81] - 2026-06-09
 
 ### Changed

@@ -2,7 +2,10 @@ module github.com/robertpelloni/hustle/hustle/content
 
 go 1.25.0
 
-require github.com/robertpelloni/hustle/orchestrator v0.0.0-00010101000000-000000000000
+require (
+	github.com/robertpelloni/hustle/hustle/publisher v0.0.0-00010101000000-000000000000
+	github.com/robertpelloni/hustle/orchestrator v0.0.0-00010101000000-000000000000
+)
 
 require (
 	github.com/dustin/go-humanize v1.0.1 // indirect
@@ -23,3 +26,5 @@ require (
 )
 
 replace github.com/robertpelloni/hustle/orchestrator => ../../orchestrator
+
+replace github.com/robertpelloni/hustle/hustle/publisher => ../publisher

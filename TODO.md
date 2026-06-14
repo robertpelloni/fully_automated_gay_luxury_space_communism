@@ -2,11 +2,12 @@
 
 ## 🔴 Blockers
 - [x] **Fix Windows CGO build** (v1.0.0-alpha.78) — Migrate `go-sqlite3` to `modernc.org/sqlite` (pure Go).
-- [ ] **Real Social Posting** — Replace stubs in `hustle/social/post.go` with real API calls.
+- [x] **Real Social Posting** (v1.0.0-alpha.82) — Real Twitter/LinkedIn API integrations (OAuth1, Bearer token) with DryRun support, error handling, and production tests.
 
 ## 🟠 High Priority
-- [ ] **Real Trading Data** — Ensure CoinGecko fetcher is production-stable with API keys if needed.
-- [ ] **Markdown CMS** — Implement automated hosting or static site generation for the content library.
+- [x] **Real Trading Data** (v1.0.0-alpha.83) — CoinGecko fetcher production-hardened with caching, retry, rate-limit handling, and API key support.
+- [x] **Markdown CMS** (v1.0.0-alpha.82) — Static site generator in `hustle/content/deploy.go` with RSS feed, responsive CSS, and local preview server.
+- [ ] **Content Deployment Pipeline** — Automated deploy to WordPress or GitHub Pages from the content output.
 
 ## 🟡 Medium Priority
 - [x] **Dashboard Styling** (v1.0.0-alpha.78) — Add color codes to the terminal UI (green for profit, red for error).
@@ -24,4 +25,6 @@
 - [x] **Git Rollback** (v1.0.0-alpha.69)
 - [x] **Mesh Wealth UI** (v1.0.0-alpha.70/75)
 - [x] **REST API Expansion** (v1.0.0-alpha.72)
-- [x] **Social Dry-Run** (v1.0.0-alpha.73)
+- [x] **Social Dry-Run & Real Posting** (v1.0.0-alpha.82) — Twitter OAuth1 + LinkedIn Bearer with tests
+- [x] **Markdown CMS / Static Site Generator** (v1.0.0-alpha.82) — `deploy.go` with RSS, CSS, server
+- [x] **CoinGecko Fetcher Hardening** (v1.0.0-alpha.83) — Caching, retry, rate-limit, API key, 14 tests

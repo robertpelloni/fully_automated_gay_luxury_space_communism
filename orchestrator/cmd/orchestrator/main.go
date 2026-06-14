@@ -89,7 +89,9 @@ func main() {
 	var fetcher trading.PriceFetcher = &trading.MockPriceFetcher{}
 	if *realPrices {
 		fmt.Println("[Trading] Real-world price fetching enabled via CoinGecko.")
-		fetcher = &trading.CoinGeckoFetcher{}
+		fetcher = trading.NewCoinGeckoFetcher()
+		fmt.Println("[Trading] COINGECKO_API_KEY " + mapBool(os.Getenv("COINGECKO_API_KEY") != "", "set", "not set — using free tier (rate limited)"))
+		fmt.Println("[Trading] COINGECKO_API_URL: " + getEnvDefault("COINGECKO_API_URL", "https://api.coingecko.com/api/v3"))
 	}
 	traderModule := &trading.TradingModule{
 		Orchestrator: orch,
@@ -781,4 +783,20 @@ func runInteractiveMenu(orch *orchestrator.Orchestrator, protocol *orchestrator.
 			fmt.Println("Invalid option, please try again.")
 		}
 	}
+}
+
+// mapBool returns a if cond is true, b if false.
+func mapBool(cond bool, a, b string) string {
+	if cond {
+		return a
+	}
+	return b
+}
+
+// getEnvDefault returns the env var value or a default.
+func getEnvDefault(key, def string) string {
+	if v := os.Getenv(key); v != "" {
+		return v
+	}
+	return def
 }
