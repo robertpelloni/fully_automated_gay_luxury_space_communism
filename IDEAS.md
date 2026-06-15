@@ -18,3 +18,6 @@
 
 ## 5. Neural Dashboard
 - Replace the terminal dashboard with a real-time 3D visualization (using something like `tview` or a separate web frontend) of the mesh as a "living organism".
+
+## 6. Automated Lead Outreach
+- Integrate with an email API (SendGrid, Mailgun) or LinkedIn automation to not just discover leads, but autonomously initiate first contact with generated personalized pitches.

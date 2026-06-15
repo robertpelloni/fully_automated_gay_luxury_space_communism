@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/robertpelloni/hustle/hustle/publisher"
 	"github.com/robertpelloni/hustle/orchestrator"
 )
 
@@ -74,6 +75,10 @@ func (c *ContentModule) Generate(req ContentRequest) (*ContentResult, error) {
 	if err != nil {
 		return nil, fmt.Errorf("LLM content generation failed: %v", err)
 	}
+
+	// Process content with affiliate links and disclosure
+	inserter := publisher.NewAffiliateInserter()
+	body = inserter.ProcessContent(body)
 
 	// Extract title from the first heading if present
 	title := req.Topic

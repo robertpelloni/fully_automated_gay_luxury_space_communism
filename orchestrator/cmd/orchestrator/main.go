@@ -14,6 +14,7 @@ import (
 
 	"github.com/robertpelloni/hustle/hustle/content"
 	"github.com/robertpelloni/hustle/hustle/curation"
+	"github.com/robertpelloni/hustle/hustle/publisher"
 	"github.com/robertpelloni/hustle/hustle/research"
 	"github.com/robertpelloni/hustle/hustle/social"
 	"github.com/robertpelloni/hustle/hustle/trading"
@@ -231,8 +232,40 @@ func main() {
 			TargetWords: 800,
 			Niche:       niche,
 		}
-		_, err := contentModule.Generate(req)
-		return err
+		res, err := contentModule.Generate(req)
+		if err != nil {
+			return err
+		}
+
+		// Handle automatic publishing if requested
+		if p.Get("publish") == "true" {
+			fmt.Printf("[Content] 🚀 Auto-publishing enabled for: %s\n", res.Title)
+
+			// Publish to WordPress if configured
+			wp := publisher.NewWordPressPublisher()
+			if *dryRun {
+				wp.DryRun = true
+			}
+			if wp.IsConfigured() {
+				_, err := wp.PublishPost(res.Title, res.Body, "publish", nil, nil)
+				if err != nil {
+					fmt.Printf("[Content] ⚠️ WordPress publish failed: %v\n", err)
+				}
+			}
+
+			// Publish to Newsletter if configured
+			if contentType == "newsletter" {
+				nl := publisher.NewNewsletterPublisher()
+				if nl.IsConfigured() {
+					err := nl.PublishNewsletter(res.Title, res.Body, nil)
+					if err != nil {
+						fmt.Printf("[Content] ⚠️ Newsletter publish failed: %v\n", err)
+					}
+				}
+			}
+		}
+
+		return nil
 	})
 
 	protocol.Register("swarm", func(p url.Values) error {
@@ -300,6 +333,19 @@ func main() {
 		}
 		h := orchestrator.NewHealer(orch)
 		h.Loop(issue)
+		return nil
+	})
+
+	protocol.Register("leadgen", func(p url.Values) error {
+		topic := p.Get("topic")
+		if topic == "" {
+			topic = "AI automation"
+		}
+		leads, err := research.DiscoverLeads(orch, topic)
+		if err != nil {
+			return err
+		}
+		fmt.Printf("[LeadGen] ✅ Discovered %d leads for %s\n", len(leads), topic)
 		return nil
 	})
 

@@ -4,9 +4,16 @@ import (
 	"bytes"
 	"io"
 	"os"
+	"regexp"
 	"strings"
 	"testing"
 )
+
+func stripANSI(str string) string {
+	const ansi = "[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]"
+	re := regexp.MustCompile(ansi)
+	return re.ReplaceAllString(str, "")
+}
 
 func TestDashboardSocialStatus(t *testing.T) {
 	orch := &Orchestrator{
@@ -40,6 +47,7 @@ func TestDashboardSocialStatus(t *testing.T) {
 	output := captureOutput(func() {
 		ShowDashboard(orch)
 	})
+	output = stripANSI(output)
 
 	if !strings.Contains(output, "Twitter:        [✗ OFFLINE]") {
 		t.Errorf("Expected Twitter OFFLINE, got \n%s", output)
@@ -63,6 +71,7 @@ func TestDashboardSocialStatus(t *testing.T) {
 	output = captureOutput(func() {
 		ShowDashboard(orch)
 	})
+	output = stripANSI(output)
 
 	if !strings.Contains(output, "Twitter:        [✓ ONLINE]") {
 		t.Errorf("Expected Twitter ONLINE, got \n%s", output)

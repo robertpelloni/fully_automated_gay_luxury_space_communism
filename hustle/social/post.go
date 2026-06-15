@@ -67,15 +67,34 @@ func (p *TwitterProvider) Post(orch *orchestrator.Orchestrator, platform, conten
 		apiURL = twitterAPIEndpoint
 	}
 
-	resp, err := httpClient.Post(apiURL, "application/json", bytes.NewBuffer(reqBody))
+	var resp *http.Response
+	for attempt := 0; attempt < 3; attempt++ {
+		if attempt > 0 {
+			time.Sleep(time.Duration(attempt) * 2 * time.Second)
+		}
+		resp, err = httpClient.Post(apiURL, "application/json", bytes.NewBuffer(reqBody))
+		if err == nil {
+			if resp.StatusCode >= 200 && resp.StatusCode < 300 {
+				break
+			}
+			if resp.StatusCode == http.StatusTooManyRequests {
+				resp.Body.Close()
+				continue
+			}
+			resp.Body.Close()
+			return fmt.Errorf("twitter API error: received status code %d", resp.StatusCode)
+		}
+	}
+
 	if err != nil {
 		return fmt.Errorf("failed to send request to Twitter API: %w", err)
 	}
-	defer resp.Body.Close()
 
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		return fmt.Errorf("twitter API error: received status code %d", resp.StatusCode)
+		resp.Body.Close()
+		return fmt.Errorf("twitter API error: received status code %d (retries exhausted)", resp.StatusCode)
 	}
+	defer resp.Body.Close()
 
 	fmt.Printf("[Twitter] Successfully posted to %s: %s\n", platform, content)
 	return nil
@@ -153,15 +172,34 @@ func (p *LinkedInProvider) Post(orch *orchestrator.Orchestrator, platform, conte
 	req.Header.Set("X-Restli-Protocol-Version", "2.0.0")
 	req.Header.Set("Content-Type", "application/json")
 
-	resp, err := client.Do(req)
+	var resp *http.Response
+	for attempt := 0; attempt < 3; attempt++ {
+		if attempt > 0 {
+			time.Sleep(time.Duration(attempt) * 2 * time.Second)
+		}
+		resp, err = client.Do(req)
+		if err == nil {
+			if resp.StatusCode == http.StatusCreated || resp.StatusCode == http.StatusOK {
+				break
+			}
+			if resp.StatusCode == http.StatusTooManyRequests {
+				resp.Body.Close()
+				continue
+			}
+			resp.Body.Close()
+			return fmt.Errorf("linkedin api returned status %d", resp.StatusCode)
+		}
+	}
+
 	if err != nil {
 		return fmt.Errorf("linkedin api request failed: %w", err)
 	}
-	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusCreated && resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("linkedin api returned status %d", resp.StatusCode)
+		resp.Body.Close()
+		return fmt.Errorf("linkedin api returned status %d (retries exhausted)", resp.StatusCode)
 	}
+	defer resp.Body.Close()
 
 	fmt.Printf("[LinkedIn] Successfully posted to %s: %s\n", platform, content)
 	return nil

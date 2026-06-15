@@ -23,9 +23,10 @@
 - **LLM Sentiment Confluence:** Filtering signals through LLM-extracted sentiment reduces noise.
 - **Mesh Aggregation:** Centralizing status in L1 memory allows the Dashboard to remain stateless.
 - **Content Generation is Highest-ROI:** Zero marginal compute cost for directly monetizable output.
+- **Automated Affiliate Inflow:** Every generated asset is a monetization vector via integrated affiliate insertion.
+- **Lead Discovery Loop:** Research now feeds directly into lead generation, creating high-value business intelligence.
 
 ## Known Technical Debt
 - `go-sqlite3` requires CGO — consider migration to `modernc.org/sqlite` for Windows compatibility.
-- Social posting providers (Twitter, LinkedIn) are still stubs.
-- Research module requires real Tavily/Brave API integration for production.
+- Social posting providers (Twitter, LinkedIn) have retry logic but still require full OAuth2 flow verification in production environments.
 - Rollback handler `Execute()` is a stub with no real git revert logic.

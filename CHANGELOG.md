@@ -1,3 +1,16 @@
+## [1.0.0-alpha.84] - 2026-06-15
+
+### Added
+- **Affiliate Monetization Engine**: Integrated `hustle/publisher/AffiliateInserter` into the content pipeline. All generated content is now automatically processed to include relevant affiliate links and legal disclosures.
+- **Lead Generation Hustle**: New `hustle://leadgen` protocol and `DiscoverLeads` functionality in `hustle/research/leadgen.go` for autonomous discovery of high-value business opportunities.
+- **Automated Content Distribution**: Enhanced `hustle://content` protocol to support a `publish=true` parameter, enabling autonomous posting to WordPress and Newsletters.
+- **Strategic Agent Upgrades**: Refined `AgentLoop` and `HustlePlan` logic to prioritize the "Research -> LeadGen -> Content -> Publish -> Social" high-ROI sequence.
+- **API Resilience**: Implemented exponential backoff and `429 Too Many Requests` awareness for Twitter, LinkedIn, and Tavily API providers.
+
+### Fixed
+- **Dashboard Stability**: Fixed a division-by-zero panic in the terminal dashboard when the wealth goal was unset.
+- **Test Integrity**: Integrated `stripANSI` utility in `orchestrator` tests to ensure reliable verification against color-coded output.
+
 ## [1.0.0-alpha.82] - 2026-06-13
 
 ### Fixed

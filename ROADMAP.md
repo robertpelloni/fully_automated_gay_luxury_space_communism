@@ -38,8 +38,10 @@
 ## Phase 5: Advanced Autonomy & Scaling (v1.0.0-alpha.78 – v1.0.0-beta.10) 🔧 IN PROGRESS
 - [ ] **Real Social API Integration** — Twitter/X and LinkedIn OAuth2/API calls
 - [ ] **Trading with real CoinGecko data** — verified in daemon mode with -real-prices
-- [ ] **Content output pipeline** — automated hosting/deployment of generated markdown
-- [ ] **Windows CGO build fix** — Migrate to `modernc.org/sqlite`
+- [x] **Content output pipeline** — automated hosting/deployment of generated markdown (v1.0.0-alpha.84)
+- [x] **Affiliate Integration** — Automated link insertion in content (v1.0.0-alpha.84)
+- [x] **Lead Generation** — Autonomous business lead discovery (v1.0.0-alpha.84)
+- [x] **Windows CGO build fix** — Migrate to `modernc.org/sqlite`
 
 ## Phase 5: Advanced Autonomy (v1.0.0-beta.11 – v1.0.0-rc.1) 📋 PLANNED
 - [ ] **Self-optimizing prompts** — A/B test prompt variations, track win rates

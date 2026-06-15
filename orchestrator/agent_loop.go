@@ -160,7 +160,8 @@ Available modules and their parameters:
 - hustle://social?platform=PLATFORM&topic=TOPIC — Generate and post content (platform: Twitter, LinkedIn)
 - hustle://trading?symbol=SYMBOL — Execute trading strategy for a crypto symbol
 - hustle://content?topic=TOPIC&type=TYPE — Generate monetizable content (type: blog, newsletter, seo, thread)
-- hustle://content?topic=TOPIC&type=blog&niche=NICHE&keywords=KW1,KW2 — Generate SEO-optimized blog post
+- hustle://content?topic=TOPIC&type=TYPE&publish=true — Generate AND publish content to WordPress/Newsletter
+- hustle://leadgen?topic=TOPIC — Discover business leads for a topic
 - hustle://chain?name=CHAIN_NAME — Execute a multi-step workflow chain
 - hustle://chain?action=discover — Discover and create new high-ROI workflow chains
 - hustle://healer?issue=DESCRIPTION — Diagnose and fix a problem
@@ -173,12 +174,12 @@ CURRENT CONTEXT:
 Iteration: %d | Successes: %d | Errors: %d
 
 STRATEGY GUIDELINES:
-1. Content generation has the HIGHEST ROI — it costs zero and produces monetizable output. Prioritize hustle://content frequently.
-2. After research, always follow up with content or social to monetize the intelligence.
-3. If errors are high, run healer. If profitable, double down on what works.
-4. Vary your actions — do NOT repeat the same action twice in a row.
-5. Use specific, targeted queries rather than generic ones.
-6. Good workflow: research → content → social (research a topic, write about it, post about it)
+1. Content generation has the HIGHEST ROI. Use hustle://content?type=blog&publish=true to maximize search traffic.
+2. High-ROI Chain: research -> leadgen -> content?type=newsletter&publish=true -> social.
+3. Research trending topics, discover leads, write about them in a newsletter, and post to social media to grow your audience.
+4. If errors are high, run healer. If profitable, double down on what works.
+5. Vary your actions — do NOT repeat the same action twice in a row.
+6. Use specific, targeted queries rather than generic ones.
 7. Mix content types: blog posts for SEO, newsletters for subscribers, threads for viral reach.
 
 Respond with ONLY the hustle:// URI, nothing else. Example: hustle://content?topic=AI+agent+market+trends+2026&type=blog`,
@@ -402,23 +403,25 @@ RECENT ACTIVITY:
 
 Generate plans from these categories:
 1. Research — Web intelligence gathering on trending topics
-2. Curation — Content aggregation and newsletter generation  
-3. Social — Automated content posting for audience growth
-4. Trading — Crypto trading with technical analysis
-5. Content — Blog/article/SEO content generation
+2. LeadGen — Automated lead discovery for business opportunities
+3. Curation — Content aggregation and newsletter generation
+4. Social — Automated content posting for audience growth
+5. Trading — Crypto trading with technical analysis
+6. Content — Blog/article/SEO/Newsletter generation and publishing
 
 Respond with a JSON array of exactly 5 objects:
 [
   {
     "name": "short_name",
     "description": "what this hustle does and why it will be profitable",
-    "category": "Research|Curation|Social|Trading|Content",
+    "category": "Research|LeadGen|Curation|Social|Trading|Content",
     "steps": ["hustle://step1", "hustle://step2"],
     "interval_min": 60,
     "priority": "high|medium|low"
   }
 ]
 
+Include "publish=true" in content steps where appropriate to ensure monetization.
 Be specific. Use real trending topics. Focus on LUXURY (high-ROI, low-maintenance).`, profitAnalysis, activityStr)
 
 	llm, ok := orch.LLM.(*OpenAICompatProvider)
