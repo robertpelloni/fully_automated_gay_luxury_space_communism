@@ -3,6 +3,7 @@ package orchestrator
 import (
 	"encoding/json"
 	"fmt"
+	"math/rand"
 	"os"
 	"sort"
 	"strings"
@@ -156,8 +157,15 @@ func (s *Scheduler) Start() {
 
 		s.mu.Lock()
 		for _, task := range s.Tasks {
-			if time.Since(task.LastRun) >= task.Interval {
-				fmt.Printf("Running task: %s\n", task.Name)
+			interval := task.Interval
+			if s.Orchestrator.StealthMode {
+				// Add random jitter (±15%) for stealth execution
+				jitter := time.Duration(float64(interval) * (rand.Float64()*0.3 - 0.15))
+				interval += jitter
+			}
+
+			if time.Since(task.LastRun) >= interval {
+				fmt.Printf("Running task: %s (Stealth: %v)\n", task.Name, s.Orchestrator.StealthMode)
 				s.mu.Unlock()
 				start := time.Now()
 				err := task.Execute(s.Orchestrator)

@@ -202,6 +202,7 @@ func (m *L3Memory) Checksum() string {
 type Orchestrator struct {
 	Version    string            `json:"version"`
 	DryRun     bool              `json:"dry_run"`
+	StealthMode bool             `json:"stealth_mode"`
 	RSSFeeds   []string          `json:"rss_feeds"`
 	Calendar   interface{}       `json:"-"` // publisher.ContentCalendar (interface{} to avoid circular dependency)
 	WealthGoal float64           `json:"wealth_goal"`

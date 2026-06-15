@@ -37,6 +37,7 @@ func main() {
 	agentIter := flag.Int("agent-iterations", 20, "Max iterations for agent loop")
 	autoPlan := flag.Bool("autoplan", false, "LLM generates and executes a strategic hustle plan")
 	dryRun := flag.Bool("dry-run", false, "Execute in dry-run mode (no external mutations)")
+	stealth := flag.Bool("stealth", false, "Run in stealth mode with randomized task jitter")
 	flag.Parse()
 
 	// Source version from VERSION.md
@@ -56,6 +57,7 @@ func main() {
 	orch := orchestrator.NewOrchestrator()
 	orch.Load("memory.json")
 	orch.DryRun = *dryRun
+	orch.StealthMode = *stealth
 
 	// Initialize SQLite Store
 	db, err := orchestrator.NewSQLiteStore("hustle.db")

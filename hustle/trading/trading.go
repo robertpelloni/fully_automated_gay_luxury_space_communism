@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"math"
 	"math/rand"
 	"net/http"
 	"os"
@@ -246,6 +247,7 @@ type TradingModule struct {
 	Fetcher      PriceFetcher
 	History      []float64
 	RSIHistory   []float64
+	MACDHistory  []float64
 	Watchlist    []string
 	mu           sync.Mutex
 }
@@ -273,21 +275,30 @@ func (t *TradingModule) ExecuteStrategy() error {
 
 	fmt.Printf("[Trading] Indicators -> SMA(5): $%.2f | RSI(14): %.2f\n", sma, rsi)
 
+	// Bollinger Bands (20, 2)
+	bbUpper, bbLower := t.calculateBollingerBands(20, 2.0)
+
+	// MACD
+	macd, signal, hist := t.calculateMACD()
+	t.MACDHistory = append(t.MACDHistory, macd)
+
+	fmt.Printf("[Trading] Indicators -> BB: (U:%.2f, L:%.2f) | MACD: %.2f (S:%.2f, H:%.2f)\n", bbUpper, bbLower, macd, signal, hist)
+
 	divergence := t.detectDivergence()
 	if divergence != "" {
 		fmt.Printf("[Trading] DIVERGENCE DETECTED: %s\n", divergence)
 	}
 
 	decision := "HOLD"
-	if len(t.History) >= 14 {
+	if len(t.History) >= 26 {
 		// Complex Decision Engine with Confluence
-		if (rsi < 30 && price < sma) || divergence == "BULLISH" {
+		if (rsi < 30 && price < sma && price <= bbLower) || divergence == "BULLISH" {
 			decision = "BUY"
-		} else if (rsi > 70 && price > sma) || divergence == "BEARISH" {
+		} else if (rsi > 70 && price > sma && price >= bbUpper) || divergence == "BEARISH" {
 			decision = "SELL"
 		}
 	} else {
-		fmt.Println("[Trading] Insufficient history for complex indicators, defaulting to HOLD.")
+		fmt.Println("[Trading] Insufficient history for complex indicators (need 26 for MACD), defaulting to HOLD.")
 	}
 
 	fmt.Printf("[Trading] Strategy Decision: %s\n", decision)
@@ -295,7 +306,7 @@ func (t *TradingModule) ExecuteStrategy() error {
 	// Persist to memory
 	t.Orchestrator.L1.Add(orchestrator.MemoryEntry{
 		ID:        fmt.Sprintf("trade-%s-%d", t.Symbol, time.Now().Unix()),
-		Content:   fmt.Sprintf("Trade Decision for %s: %s at $%.2f (SMA: $%.2f, RSI: %.2f, Div: %s)", t.Symbol, decision, price, sma, rsi, divergence),
+		Content:   fmt.Sprintf("Trade Decision for %s: %s at $%.2f (SMA: $%.2f, RSI: %.2f, BB-L: %.2f, MACD: %.2f)", t.Symbol, decision, price, sma, rsi, bbLower, macd),
 		Timestamp: time.Now(),
 		Tags:      []string{"trading", t.Symbol, decision},
 	})
@@ -392,7 +403,7 @@ func (t *TradingModule) calculateRSI(period int) float64 {
 		if change > 0 {
 			gains += change
 		} else {
-			losses -= change
+			losses -= math.Abs(change)
 		}
 	}
 
@@ -400,6 +411,52 @@ func (t *TradingModule) calculateRSI(period int) float64 {
 		return 100.0
 	}
 
-	rs := (gains / float64(period)) / (losses / float64(period))
+	// RSI uses absolute values for average loss
+	absLosses := math.Abs(losses)
+	rs := (gains / float64(period)) / (absLosses / float64(period))
 	return 100.0 - (100.0 / (1.0 + rs))
+}
+
+func (t *TradingModule) calculateBollingerBands(period int, stdDevMultiplier float64) (upper, lower float64) {
+	if len(t.History) < period {
+		return 0, 0
+	}
+
+	sma := t.calculateSMA(period)
+	variance := 0.0
+	for i := len(t.History) - period; i < len(t.History); i++ {
+		diff := t.History[i] - sma
+		variance += diff * diff
+	}
+	stdDev := math.Sqrt(variance / float64(period))
+
+	upper = sma + (stdDevMultiplier * stdDev)
+	lower = sma - (stdDevMultiplier * stdDev)
+	return upper, lower
+}
+
+func (t *TradingModule) calculateEMA(period int, data []float64) float64 {
+	if len(data) < period {
+		return 0
+	}
+	multiplier := 2.0 / (float64(period) + 1.0)
+	ema := data[len(data)-period]
+	for i := len(data) - period + 1; i < len(data); i++ {
+		ema = (data[i]-ema)*multiplier + ema
+	}
+	return ema
+}
+
+func (t *TradingModule) calculateMACD() (macd, signal, histogram float64) {
+	if len(t.History) < 26 {
+		return 0, 0, 0
+	}
+	ema12 := t.calculateEMA(12, t.History)
+	ema26 := t.calculateEMA(26, t.History)
+	macd = ema12 - ema26
+
+	signal = t.calculateEMA(9, t.MACDHistory)
+	histogram = macd - signal
+
+	return macd, signal, histogram
 }

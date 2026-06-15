@@ -11,6 +11,8 @@
 - [x] **Affiliate Automation** (v1.0.0-alpha.84) — Automatic link insertion in all generated content.
 - [x] **Lead Discovery** (v1.0.0-alpha.84) — LLM-driven identification of business leads from research.
 - [x] **LLM response cache** (v1.0.0-alpha.86) — Content-addressable local SQLite cache.
+- [x] **Bollinger Bands & MACD** (v1.0.0-alpha.87) — Advanced technical indicators for trading.
+- [x] **Ghost Protocol Base** (v1.0.0-alpha.87) — Stealth mode task jitter.
 
 ## 🟡 Medium Priority
 - [x] **Dashboard Styling** (v1.0.0-alpha.78) — Add color codes to the terminal UI (green for profit, red for error).

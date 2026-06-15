@@ -44,10 +44,11 @@
 - [x] **Windows CGO build fix** — Migrate to `modernc.org/sqlite`
 - [x] **LLM response cache** — Content-addressable SQLite cache for identical prompts (v1.0.0-alpha.86)
 - [x] **Cross-hustle feedback** — Lead discovery seeds content and outreach (v1.0.0-alpha.86)
+- [x] **Advanced trading indicators** — Bollinger Bands and MACD implementation (v1.0.0-alpha.87)
+- [x] **Stealth Mode** — Ghost Protocol jitter for scheduled tasks (v1.0.0-alpha.87)
+- [x] **Self-optimizing prompts** — ROI-driven prompt mutation loop (v1.0.0-alpha.87)
 
 ## Phase 5: Advanced Autonomy (v1.0.0-beta.11 – v1.0.0-rc.1) 📋 PLANNED
-- [ ] **Self-optimizing prompts** — A/B test prompt variations, track win rates
-- [ ] **Advanced trading indicators** — MACD, Bollinger Bands, volume analysis
 - [ ] **Multi-exchange trading** — Binance, Kraken exchange plugins
 
 ## Phase 6: Federation & Scale (v1.0.0-rc.2 – v1.0.0) 📋 PLANNED

@@ -138,6 +138,13 @@ func (c *ContentModule) Generate(req ContentRequest) (*ContentResult, error) {
 
 // buildPrompt creates an LLM prompt optimized for the content type
 func (c *ContentModule) buildPrompt(req ContentRequest) string {
+	// Check for optimized prompt in L3 memory
+	if entries := c.Orch.L3.Search("optimized-prompt-content"); len(entries) > 0 {
+		optimized := entries[len(entries)-1].Content
+		fmt.Printf("[Content] Using SELF-OPTIMIZED PROMPT for %s piece\n", req.Type)
+		return strings.ReplaceAll(optimized, "[topic]", req.Topic)
+	}
+
 	keywordsStr := strings.Join(req.Keywords, ", ")
 
 	switch req.Type {

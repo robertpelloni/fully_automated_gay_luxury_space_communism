@@ -1,3 +1,14 @@
+## [1.0.0-alpha.87] - 2026-06-16
+
+### Added
+- **Ghost Protocol (Stealth Mode)**: New `-stealth` CLI flag and logic to introduce randomized ±15% timing jitter to scheduled tasks, preventing bot detection patterns.
+- **Advanced Trading Intelligence**: Implemented Bollinger Bands and MACD technical indicators in the `TradingModule` for higher-signal trade confluence.
+- **Autonomous Prompt Evolution**: Added `OptimizePrompts` feedback loop to the `Healer` that uses revenue data to autonomously mutate and improve content generation prompts.
+- **Acquisition & Distribution**: Finalized the lead discovery, outreach prepare, and multi-platform strategic calendar orchestration loop.
+
+### Fixed
+- **Technical Indicator Accuracy**: Fixed a mathematical error in the RSI calculation to ensure correct technical signaling.
+
 ## [1.0.0-alpha.84] - 2026-06-15
 
 ### Added
