@@ -1,3 +1,38 @@
+## [1.0.0-alpha.88] - 2026-06-17
+
+### Added
+- **Real Trade Execution (Binance)**: Implemented `BinanceExecutor` for authenticated BUY/SELL orders on the Binance exchange, transitioning from paper trading to real capital growth.
+- **Autonomous Outreach Delivery (SMTP)**: Added SMTP support to the `outreach` module. The machine now autonomously delivers personalized pitches to discovered leads using their extracted contact info.
+- **Micro-SaaS Generation**: Expanded `ContentModule` with a `tool` type to generate self-contained HTML/JS applications, driving diversified "Utility SEO" traffic.
+- **Acquisition Pipeline Hardening**: Updated `LeadGen` to autonomously extract contact emails from research results.
+
+### Fixed
+- **Safety Lockdown**: Fixed a critical bug where `ContentCalendar` publishing would bypass `DryRun` mode. All social posts now correctly honor the global safety state.
+
+## [1.0.0-alpha.87] - 2026-06-16
+
+### Added
+- **Ghost Protocol (Stealth Mode)**: New `-stealth` CLI flag and logic to introduce randomized ±15% timing jitter to scheduled tasks, preventing bot detection patterns.
+- **Advanced Trading Intelligence**: Implemented Bollinger Bands and MACD technical indicators in the `TradingModule` for higher-signal trade confluence.
+- **Autonomous Prompt Evolution**: Added `OptimizePrompts` feedback loop to the `Healer` that uses revenue data to autonomously mutate and improve content generation prompts.
+- **Acquisition & Distribution**: Finalized the lead discovery, outreach prepare, and multi-platform strategic calendar orchestration loop.
+
+### Fixed
+- **Technical Indicator Accuracy**: Fixed a mathematical error in the RSI calculation to ensure correct technical signaling.
+
+## [1.0.0-alpha.84] - 2026-06-15
+
+### Added
+- **Affiliate Monetization Engine**: Integrated `hustle/publisher/AffiliateInserter` into the content pipeline. All generated content is now automatically processed to include relevant affiliate links and legal disclosures.
+- **Lead Generation Hustle**: New `hustle://leadgen` protocol and `DiscoverLeads` functionality in `hustle/research/leadgen.go` for autonomous discovery of high-value business opportunities.
+- **Automated Content Distribution**: Enhanced `hustle://content` protocol to support a `publish=true` parameter, enabling autonomous posting to WordPress and Newsletters.
+- **Strategic Agent Upgrades**: Refined `AgentLoop` and `HustlePlan` logic to prioritize the "Research -> LeadGen -> Content -> Publish -> Social" high-ROI sequence.
+- **API Resilience**: Implemented exponential backoff and `429 Too Many Requests` awareness for Twitter, LinkedIn, and Tavily API providers.
+
+### Fixed
+- **Dashboard Stability**: Fixed a division-by-zero panic in the terminal dashboard when the wealth goal was unset.
+- **Test Integrity**: Integrated `stripANSI` utility in `orchestrator` tests to ensure reliable verification against color-coded output.
+
 ## [1.0.0-alpha.82] - 2026-06-13
 
 ### Fixed

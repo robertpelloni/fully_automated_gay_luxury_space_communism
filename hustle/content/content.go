@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/robertpelloni/hustle/hustle/publisher"
 	"github.com/robertpelloni/hustle/orchestrator"
 )
 
@@ -18,6 +19,7 @@ const (
 	Newsletter  ContentType = "newsletter"
 	SEOArticle  ContentType = "seo"
 	SocialThread ContentType = "thread"
+	MicroTool   ContentType = "tool"
 )
 
 // ContentRequest specifies what content to generate
@@ -74,6 +76,10 @@ func (c *ContentModule) Generate(req ContentRequest) (*ContentResult, error) {
 	if err != nil {
 		return nil, fmt.Errorf("LLM content generation failed: %v", err)
 	}
+
+	// Process content with affiliate links and disclosure
+	inserter := publisher.NewAffiliateInserter()
+	body = inserter.ProcessContent(body)
 
 	// Extract title from the first heading if present
 	title := req.Topic
@@ -133,6 +139,13 @@ func (c *ContentModule) Generate(req ContentRequest) (*ContentResult, error) {
 
 // buildPrompt creates an LLM prompt optimized for the content type
 func (c *ContentModule) buildPrompt(req ContentRequest) string {
+	// Check for optimized prompt in L3 memory
+	if entries := c.Orch.L3.Search("optimized-prompt-content"); len(entries) > 0 {
+		optimized := entries[len(entries)-1].Content
+		fmt.Printf("[Content] Using SELF-OPTIMIZED PROMPT for %s piece\n", req.Type)
+		return strings.ReplaceAll(optimized, "[topic]", req.Topic)
+	}
+
 	keywordsStr := strings.Join(req.Keywords, ", ")
 
 	switch req.Type {
@@ -193,6 +206,19 @@ Requirements:
 - Tone: thought-provoking, insider perspective, no fluff
 
 Format: Number each tweet like 1/ 2/ etc.`, req.Topic, req.Niche)
+
+	case MicroTool:
+		return fmt.Sprintf(`Generate a self-contained, single-file HTML/JavaScript utility tool for: "%s".
+
+Requirements:
+- Niche: %s
+- The tool must be useful and solve a specific problem (e.g. calculator, converter, generator)
+- Include CSS for a modern, dark-themed UI
+- All logic must be in the same file
+- Include SEO-friendly text description above and below the tool
+- Add a footer with an affiliate link call-to-action
+
+Format: Complete HTML file`, req.Topic, req.Niche)
 
 	default:
 		return fmt.Sprintf(`Write an informative article about "%s" (~%d words). Keywords: %s. Format: Markdown.`,

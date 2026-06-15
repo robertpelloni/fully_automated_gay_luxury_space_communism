@@ -27,6 +27,7 @@ As of 1.0.0-alpha.78, the system has successfully transitioned from mock LLMs to
 A globally distributed, self-healing mesh of thousands of nodes, each running local LLMs that continuously:
 
 - **Research** trending opportunities across markets and social media
+- **Discover Leads** identify specific companies and niches for high-value outreach
 - **Create** monetizable content (blogs, newsletters, SEO articles, social threads)
 - **Trade** crypto assets with technical analysis and sentiment confluence
 - **Curate** intelligence into actionable reports and newsletters

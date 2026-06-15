@@ -1,7 +1,6 @@
 package orchestrator
 
 import (
-	"encoding/json"
 	"fmt"
 	"strings"
 	"time"
@@ -159,8 +158,10 @@ Available modules and their parameters:
 - hustle://curation?topic=TOPIC — Curate and summarize content on a topic
 - hustle://social?platform=PLATFORM&topic=TOPIC — Generate and post content (platform: Twitter, LinkedIn)
 - hustle://trading?symbol=SYMBOL — Execute trading strategy for a crypto symbol
-- hustle://content?topic=TOPIC&type=TYPE — Generate monetizable content (type: blog, newsletter, seo, thread)
-- hustle://content?topic=TOPIC&type=blog&niche=NICHE&keywords=KW1,KW2 — Generate SEO-optimized blog post
+- hustle://content?topic=TOPIC&type=TYPE — Generate monetizable content (type: blog, newsletter, seo, thread, tool)
+- hustle://content?topic=TOPIC&type=TYPE&publish=true — Generate AND publish content to WordPress/Newsletter
+- hustle://leadgen?topic=TOPIC — Discover business leads for a topic
+- hustle://calendar?action=process — Process and publish scheduled content
 - hustle://chain?name=CHAIN_NAME — Execute a multi-step workflow chain
 - hustle://chain?action=discover — Discover and create new high-ROI workflow chains
 - hustle://healer?issue=DESCRIPTION — Diagnose and fix a problem
@@ -173,13 +174,14 @@ CURRENT CONTEXT:
 Iteration: %d | Successes: %d | Errors: %d
 
 STRATEGY GUIDELINES:
-1. Content generation has the HIGHEST ROI — it costs zero and produces monetizable output. Prioritize hustle://content frequently.
-2. After research, always follow up with content or social to monetize the intelligence.
-3. If errors are high, run healer. If profitable, double down on what works.
-4. Vary your actions — do NOT repeat the same action twice in a row.
-5. Use specific, targeted queries rather than generic ones.
-6. Good workflow: research → content → social (research a topic, write about it, post about it)
-7. Mix content types: blog posts for SEO, newsletters for subscribers, threads for viral reach.
+1. Content generation has the HIGHEST ROI. Use hustle://content?type=blog&publish=true to maximize search traffic.
+2. High-ROI Chain: research -> leadgen -> outreach -> content?type=newsletter&publish=true -> social.
+3. Use hustle://calendar?action=process daily to maintain a consistent publishing schedule across platforms.
+4. Research trending topics, discover leads, prepare outreach pitches, write about them in a newsletter, and post to social media to grow your audience.
+4. If errors are high, run healer. If profitable, double down on what works.
+5. Vary your actions — do NOT repeat the same action twice in a row.
+6. Use specific, targeted queries rather than generic ones.
+7. Mix content types: blog posts for SEO, newsletters for subscribers, threads for viral reach, and utility tools for utility SEO traffic.
 
 Respond with ONLY the hustle:// URI, nothing else. Example: hustle://content?topic=AI+agent+market+trends+2026&type=blog`,
 		a.State.HustleType, context, a.State.Iterations, a.State.Successes, a.State.Errors)
@@ -384,6 +386,25 @@ type HustlePlan struct {
 // PlanHustles asks the LLM to analyze current state and generate a set of actionable hustle plans
 func PlanHustles(orch *Orchestrator) ([]HustlePlan, error) {
 	profitAnalysis := orch.Ledger.AnalyzeProfitability()
+
+	// High-signal inputs: Discovered Alpha and Leads
+	alphaEntries := orch.L2.Search("alpha")
+	leadEntries := orch.L2.Search("leadgen")
+
+	var signalContext string
+	if len(alphaEntries) > 0 {
+		signalContext += "\nDISCOVERED ALPHA (HIGH-SIGNAL):\n"
+		for _, e := range alphaEntries {
+			signalContext += fmt.Sprintf("- %s\n", e.Content)
+		}
+	}
+	if len(leadEntries) > 0 {
+		signalContext += "\nDISCOVERED LEADS (ACQUISITION TARGETS):\n"
+		for _, e := range leadEntries {
+			signalContext += fmt.Sprintf("- %s\n", e.Content)
+		}
+	}
+
 	recentActivity := orch.L1.Search("")
 	if len(recentActivity) > 10 {
 		recentActivity = recentActivity[len(recentActivity)-10:]
@@ -399,44 +420,34 @@ func PlanHustles(orch *Orchestrator) ([]HustlePlan, error) {
 FINANCIAL STATE: %s
 RECENT ACTIVITY:
 %s
+%s
 
 Generate plans from these categories:
 1. Research — Web intelligence gathering on trending topics
-2. Curation — Content aggregation and newsletter generation  
-3. Social — Automated content posting for audience growth
-4. Trading — Crypto trading with technical analysis
-5. Content — Blog/article/SEO content generation
+2. LeadGen — Automated lead discovery for business opportunities
+3. Curation — Content aggregation and newsletter generation
+4. Social — Automated content posting for audience growth
+5. Trading — Crypto trading with real execution on Binance
+6. Content — Blog/article/SEO/Newsletter/Utility-Tool generation and publishing
 
 Respond with a JSON array of exactly 5 objects:
 [
   {
     "name": "short_name",
     "description": "what this hustle does and why it will be profitable",
-    "category": "Research|Curation|Social|Trading|Content",
+    "category": "Research|LeadGen|Curation|Social|Trading|Content",
     "steps": ["hustle://step1", "hustle://step2"],
     "interval_min": 60,
     "priority": "high|medium|low"
   }
 ]
 
-Be specific. Use real trending topics. Focus on LUXURY (high-ROI, low-maintenance).`, profitAnalysis, activityStr)
-
-	llm, ok := orch.LLM.(*OpenAICompatProvider)
-	if !ok {
-		// Fallback for non-OpenAI compat providers
-		response, err := orch.LLM.Generate(prompt)
-		if err != nil {
-			return nil, err
-		}
-		var plans []HustlePlan
-		if err := json.Unmarshal([]byte(response), &plans); err != nil {
-			return nil, fmt.Errorf("failed to parse LLM plan response: %v", err)
-		}
-		return plans, nil
-	}
+Include "publish=true" in content steps where appropriate to ensure monetization.
+PRIORITIZE: Use the DISCOVERED ALPHA or LEADS to seed content topics and keywords. If you found a lead, generate content targeting their niche and prepare an outreach pitch.
+Be specific. Use real trending topics. Focus on LUXURY (high-ROI, low-maintenance).`, profitAnalysis, activityStr, signalContext)
 
 	var plans []HustlePlan
-	if err := llm.GenerateJSON(prompt, &plans); err != nil {
+	if err := orch.LLM.GenerateJSON(prompt, &plans); err != nil {
 		return nil, fmt.Errorf("failed to generate hustle plans: %v", err)
 	}
 

@@ -6,6 +6,8 @@ replace github.com/robertpelloni/hustle/orchestrator => ../../orchestrator
 
 require github.com/robertpelloni/hustle/orchestrator v0.0.0-00010101000000-000000000000
 
+replace github.com/robertpelloni/hustle/hustle/research => ../research
+
 require (
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/google/uuid v1.6.0 // indirect

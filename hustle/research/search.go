@@ -115,15 +115,35 @@ func (s *ResearchSearch) queryTavily(q string) ([]SearchResult, error) {
 	}
 	body, _ := json.Marshal(payload)
 
-	resp, err := http.Post(url, "application/json", strings.NewReader(string(body)))
+	var resp *http.Response
+	var err error
+	for attempt := 0; attempt < 3; attempt++ {
+		if attempt > 0 {
+			time.Sleep(time.Duration(attempt) * 2 * time.Second)
+		}
+		resp, err = http.Post(url, "application/json", strings.NewReader(string(body)))
+		if err == nil {
+			if resp.StatusCode == http.StatusOK {
+				break
+			}
+			if resp.StatusCode == http.StatusTooManyRequests {
+				resp.Body.Close()
+				continue
+			}
+			resp.Body.Close()
+			return nil, fmt.Errorf("tavily API returned status: %d", resp.StatusCode)
+		}
+	}
+
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("tavily API returned status: %d", resp.StatusCode)
+		resp.Body.Close()
+		return nil, fmt.Errorf("tavily API returned status: %d (retries exhausted)", resp.StatusCode)
 	}
+	defer resp.Body.Close()
 
 	var data struct {
 		Results []struct {

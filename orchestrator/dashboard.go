@@ -143,17 +143,22 @@ func ShowDashboard(orch *Orchestrator) {
 	fmt.Printf("  COLLECTIVE MESH PROFIT: %s$%.2f%s\n", collProfitColor, collectiveProfit, colorReset)
 
 	// Collective Goal Progress
-	meshGoal := orch.WealthGoal
-	progress := (collectiveProfit / meshGoal) * 100
+	currentGoal := orch.WealthGoal
+	if currentGoal <= 0 {
+		currentGoal = 10000 // Default goal for display if not set
+	}
+	progress := (collectiveProfit / currentGoal) * 100
 	if progress < 0 { progress = 0 }
+
 	// ASCII Progress Bar
 	barWidth := 20
 	filled := int((progress / 100) * float64(barWidth))
+	if filled < 0 { filled = 0 }
 	if filled > barWidth { filled = barWidth }
 	bar := strings.Repeat("█", filled) + strings.Repeat("░", barWidth-filled)
 
 	fmt.Printf("  GOAL PROGRESS:  [%s] %s%.1f%%%s\n", bar, colorCyan, progress, colorReset)
-	fmt.Printf("  TARGET WEALTH:  $%.2f\n", meshGoal)
+	fmt.Printf("  TARGET WEALTH:  $%.2f\n", currentGoal)
 
 	// Display leaderboard
 	sort.Slice(leaderboard, func(i, j int) bool {

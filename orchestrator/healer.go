@@ -76,6 +76,52 @@ func (h *Healer) Verify(fix string) bool {
 	return strings.Contains(strings.ToUpper(response), "SUCCESS")
 }
 
+// OptimizePrompts analyzes content performance and proposes prompt improvements
+func (h *Healer) OptimizePrompts() {
+	fmt.Println("[Healer] Running Prompt Self-Optimization loop...")
+
+	// Analyze L2 successes vs Revenue
+	revenue := h.Orchestrator.Ledger.TotalRevenue()
+	if revenue < 10 {
+		return // Not enough data yet
+	}
+
+	successes := h.Orchestrator.L2.Search("content")
+	if len(successes) == 0 {
+		return
+	}
+
+	prompt := fmt.Sprintf(`Act as a conversion optimization expert. Analyze the following content generation history and total revenue ($%.2f), and propose an IMPROVED system prompt for content generation.
+
+HISTORY:
+%d successful content pieces generated.
+
+Current default prompt: "Write a comprehensive blog post about [topic]..."
+
+Respond with a JSON object:
+{
+  "optimized_prompt": "The new, high-conversion prompt instruction",
+  "reasoning": "why this will work better"
+}
+
+Respond ONLY with valid JSON.`, revenue, len(successes))
+
+	var result struct {
+		OptimizedPrompt string `json:"optimized_prompt"`
+		Reasoning      string `json:"reasoning"`
+	}
+
+	if err := h.Orchestrator.LLM.GenerateJSON(prompt, &result); err == nil {
+		fmt.Printf("[Healer] Optimized Prompt Discovered: %s\n", result.Reasoning)
+		h.Orchestrator.L3.Add(MemoryEntry{
+			ID:        "optimized-prompt-content",
+			Content:   result.OptimizedPrompt,
+			Timestamp: time.Now(),
+			Tags:      []string{"optimization", "prompt", "content"},
+		})
+	}
+}
+
 // WealthPreservation analyzes active hustles and terminates underperforming ones
 func (h *Healer) WealthPreservation() {
 	fmt.Println("[Healer] Running Wealth Preservation ROI Audit...")

@@ -38,15 +38,20 @@
 ## Phase 5: Advanced Autonomy & Scaling (v1.0.0-alpha.78 – v1.0.0-beta.10) 🔧 IN PROGRESS
 - [ ] **Real Social API Integration** — Twitter/X and LinkedIn OAuth2/API calls
 - [ ] **Trading with real CoinGecko data** — verified in daemon mode with -real-prices
-- [ ] **Content output pipeline** — automated hosting/deployment of generated markdown
-- [ ] **Windows CGO build fix** — Migrate to `modernc.org/sqlite`
+- [x] **Content output pipeline** — automated hosting/deployment of generated markdown (v1.0.0-alpha.84)
+- [x] **Affiliate Integration** — Automated link insertion in content (v1.0.0-alpha.84)
+- [x] **Lead Generation** — Autonomous business lead discovery (v1.0.0-alpha.84)
+- [x] **Windows CGO build fix** — Migrate to `modernc.org/sqlite`
+- [x] **LLM response cache** — Content-addressable SQLite cache for identical prompts (v1.0.0-alpha.86)
+- [x] **Cross-hustle feedback** — Lead discovery seeds content and outreach (v1.0.0-alpha.86)
+- [x] **Advanced trading indicators** — Bollinger Bands and MACD implementation (v1.0.0-alpha.87)
+- [x] **Stealth Mode** — Ghost Protocol jitter for scheduled tasks (v1.0.0-alpha.87)
+- [x] **Self-optimizing prompts** — ROI-driven prompt mutation loop (v1.0.0-alpha.87)
+- [x] **Real-world Execution** — Binance and SMTP delivery integration (v1.0.0-alpha.88)
+- [x] **Micro-SaaS Pivot** — Autonomous generation of utility tools (v1.0.0-alpha.88)
 
 ## Phase 5: Advanced Autonomy (v1.0.0-beta.11 – v1.0.0-rc.1) 📋 PLANNED
-- [ ] **Self-optimizing prompts** — A/B test prompt variations, track win rates
-- [ ] **Advanced trading indicators** — MACD, Bollinger Bands, volume analysis
-- [ ] **Multi-exchange trading** — Binance, Kraken exchange plugins
-- [ ] **Cross-hustle feedback** — research discoveries feed content topics, content feeds social
-- [ ] **LLM response cache** — content-addressable cache for identical prompts
+- [ ] **Multi-exchange trading** — Kraken, Coinbase exchange plugins
 
 ## Phase 6: Federation & Scale (v1.0.0-rc.2 – v1.0.0) 📋 PLANNED
 - [ ] **Multi-node cluster testing** — 10+ peers with real mesh sync

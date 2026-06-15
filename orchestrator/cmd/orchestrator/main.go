@@ -14,6 +14,7 @@ import (
 
 	"github.com/robertpelloni/hustle/hustle/content"
 	"github.com/robertpelloni/hustle/hustle/curation"
+	"github.com/robertpelloni/hustle/hustle/publisher"
 	"github.com/robertpelloni/hustle/hustle/research"
 	"github.com/robertpelloni/hustle/hustle/social"
 	"github.com/robertpelloni/hustle/hustle/trading"
@@ -36,6 +37,7 @@ func main() {
 	agentIter := flag.Int("agent-iterations", 20, "Max iterations for agent loop")
 	autoPlan := flag.Bool("autoplan", false, "LLM generates and executes a strategic hustle plan")
 	dryRun := flag.Bool("dry-run", false, "Execute in dry-run mode (no external mutations)")
+	stealth := flag.Bool("stealth", false, "Run in stealth mode with randomized task jitter")
 	flag.Parse()
 
 	// Source version from VERSION.md
@@ -55,6 +57,7 @@ func main() {
 	orch := orchestrator.NewOrchestrator()
 	orch.Load("memory.json")
 	orch.DryRun = *dryRun
+	orch.StealthMode = *stealth
 
 	// Initialize SQLite Store
 	db, err := orchestrator.NewSQLiteStore("hustle.db")
@@ -69,7 +72,12 @@ func main() {
 	// Auto-detect and test the LLM connection
 	if model, err := llmProvider.DetectModel(); err == nil {
 		fmt.Printf("[LLM] ✅ Connected to local LLM: %s\n", model)
-		orch.LLM = llmProvider
+		// Wrap with cache if DB available
+		if orch.DB != nil {
+			orch.LLM = &orchestrator.CachingLLM{Provider: llmProvider, Store: orch.DB}
+		} else {
+			orch.LLM = llmProvider
+		}
 		// Also set up real embeddings
 		orch.Embedder = orchestrator.NewOpenAICompatEmbedder()
 	} else {
@@ -85,6 +93,11 @@ func main() {
 	swarm := orchestrator.NewMemorySwarm(orch, broker)
 	multiAgent := orchestrator.NewMultiAgentOrchestrator(orch, protocol, broker)
 
+	// Initialize Content Calendar
+	contentCalendar := publisher.NewContentCalendar()
+	contentCalendar.LoadCalendar()
+	orch.Calendar = contentCalendar
+
 	// ── Initialize Trading Module ──
 	var fetcher trading.PriceFetcher = &trading.MockPriceFetcher{}
 	if *realPrices {
@@ -93,10 +106,21 @@ func main() {
 		fmt.Println("[Trading] COINGECKO_API_KEY " + mapBool(os.Getenv("COINGECKO_API_KEY") != "", "set", "not set — using free tier (rate limited)"))
 		fmt.Println("[Trading] COINGECKO_API_URL: " + getEnvDefault("COINGECKO_API_URL", "https://api.coingecko.com/api/v3"))
 	}
+	// ── Initialize Trading Module ──
+	var executor trading.TradeExecutor = &trading.MockExecutor{}
+	if os.Getenv("BINANCE_API_KEY") != "" {
+		fmt.Println("[Trading] Real execution enabled via Binance.")
+		executor = trading.NewBinanceExecutor()
+	} else if os.Getenv("KRAKEN_API_KEY") != "" {
+		fmt.Println("[Trading] Real execution enabled via Kraken.")
+		executor = trading.NewKrakenExecutor()
+	}
+
 	traderModule := &trading.TradingModule{
 		Orchestrator: orch,
 		Broker:       broker,
 		Fetcher:      fetcher,
+		Executor:     executor,
 	}
 
 	// ── Initialize Content Module ──
@@ -192,6 +216,23 @@ func main() {
 			return provider.Post(orch, platform, contentStr)
 		}
 
+		if p.Get("action") == "engage" {
+			fmt.Printf("[Social] Engaging with topic: %s\n", topic)
+			posts, err := provider.Search(topic)
+			if err != nil {
+				return err
+			}
+			if len(posts) == 0 {
+				fmt.Println("[Social] No relevant posts found to engage with.")
+				return nil
+			}
+
+			// Engage with the first post
+			target := posts[0]
+			reply := social.GenerateContent(orch, "reply to: "+target.Content)
+			return provider.Reply(target.ID, reply)
+		}
+
 		social.SchedulePost(orch, provider, platform, topic)
 		return nil
 	})
@@ -231,8 +272,40 @@ func main() {
 			TargetWords: 800,
 			Niche:       niche,
 		}
-		_, err := contentModule.Generate(req)
-		return err
+		res, err := contentModule.Generate(req)
+		if err != nil {
+			return err
+		}
+
+		// Handle automatic publishing if requested
+		if p.Get("publish") == "true" {
+			fmt.Printf("[Content] 🚀 Auto-publishing enabled for: %s\n", res.Title)
+
+			// Publish to WordPress if configured
+			wp := publisher.NewWordPressPublisher()
+			if *dryRun {
+				wp.DryRun = true
+			}
+			if wp.IsConfigured() {
+				_, err := wp.PublishPost(res.Title, res.Body, "publish", nil, nil)
+				if err != nil {
+					fmt.Printf("[Content] ⚠️ WordPress publish failed: %v\n", err)
+				}
+			}
+
+			// Publish to Newsletter if configured
+			if contentType == "newsletter" {
+				nl := publisher.NewNewsletterPublisher()
+				if nl.IsConfigured() {
+					err := nl.PublishNewsletter(res.Title, res.Body, nil)
+					if err != nil {
+						fmt.Printf("[Content] ⚠️ Newsletter publish failed: %v\n", err)
+					}
+				}
+			}
+		}
+
+		return nil
 	})
 
 	protocol.Register("swarm", func(p url.Values) error {
@@ -300,6 +373,75 @@ func main() {
 		}
 		h := orchestrator.NewHealer(orch)
 		h.Loop(issue)
+		return nil
+	})
+
+	protocol.Register("leadgen", func(p url.Values) error {
+		topic := p.Get("topic")
+		if topic == "" {
+			topic = "AI automation"
+		}
+		leads, err := research.DiscoverLeads(orch, topic)
+		if err != nil {
+			return err
+		}
+		fmt.Printf("[LeadGen] ✅ Discovered %d leads for %s\n", len(leads), topic)
+		return nil
+	})
+
+	protocol.Register("affiliate", func(p url.Values) error {
+		action := p.Get("action")
+		niche := p.Get("niche")
+		if niche == "" {
+			niche = "AI productivity tools"
+		}
+
+		if action == "discover" {
+			inserter := publisher.NewAffiliateInserter()
+			return inserter.DiscoverAffiliatePrograms(orch, niche)
+		}
+		return fmt.Errorf("unknown affiliate action: %s", action)
+	})
+
+	protocol.Register("outreach", func(p url.Values) error {
+		topic := p.Get("topic")
+		if topic == "" {
+			topic = "AI automation services"
+		}
+		send := p.Get("send") == "true"
+
+		pitches, err := research.GenerateOutreach(orch, topic)
+		if err != nil {
+			return err
+		}
+		fmt.Printf("[Outreach] ✅ Prepared %d personalized pitches for %s\n", len(pitches), topic)
+
+		if send {
+			for _, pitch := range pitches {
+				if pitch.Platform == "email" {
+					if err := research.SendEmail(pitch); err != nil {
+						fmt.Printf("[Outreach] ❌ Failed to send email to %s: %v\n", pitch.RecipientName, err)
+					}
+				}
+			}
+		}
+
+		return nil
+	})
+
+	protocol.Register("calendar", func(p url.Values) error {
+		action := p.Get("action")
+		if action == "process" {
+			pending := contentCalendar.GetPendingEntries()
+			fmt.Printf("[Calendar] Processing %d pending entries\n", len(pending))
+			for _, entry := range pending {
+				if err := contentCalendar.PublishEntry(orch, &entry); err != nil {
+					fmt.Printf("[Calendar] ❌ Failed to publish %s: %v\n", entry.ID, err)
+				}
+			}
+		} else if action == "status" {
+			contentCalendar.PrintStatus()
+		}
 		return nil
 	})
 
