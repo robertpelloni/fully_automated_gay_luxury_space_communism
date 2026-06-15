@@ -13,6 +13,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/robertpelloni/hustle/hustle/research"
 	"github.com/robertpelloni/hustle/orchestrator"
 )
 
@@ -270,6 +271,24 @@ func (t *TradingModule) ExecuteStrategy() error {
 
 	fmt.Printf("[Trading] Executing strategy for Symbol: %s\n", t.Symbol)
 
+	// CONFLUENCE 2.0: Sentiment Analysis via Research Module
+	sentiment := "NEUTRAL"
+	searcher := research.NewResearchSearch(research.Tavily, t.Orchestrator, t.Broker)
+	results, err := searcher.Query(t.Symbol + " price sentiment news")
+	if err == nil && len(results) > 0 {
+		var combinedSnippet string
+		for _, r := range results { combinedSnippet += r.Snippet + " " }
+
+		prompt := fmt.Sprintf("Analyze the market sentiment for %s based on these news snippets: %s. Respond with ONLY 'BULLISH', 'BEARISH', or 'NEUTRAL'.", t.Symbol, combinedSnippet)
+		resp, _ := t.Orchestrator.LLM.Generate(prompt)
+		if strings.Contains(strings.ToUpper(resp), "BULLISH") {
+			sentiment = "BULLISH"
+		} else if strings.Contains(strings.ToUpper(resp), "BEARISH") {
+			sentiment = "BEARISH"
+		}
+	}
+	fmt.Printf("[Trading] Live Sentiment Confluence: %s\n", sentiment)
+
 	price, err := t.Fetcher.GetPrice(t.Symbol)
 	if err != nil {
 		return fmt.Errorf("failed to fetch price: %v", err)
@@ -303,11 +322,16 @@ func (t *TradingModule) ExecuteStrategy() error {
 
 	decision := "HOLD"
 	if len(t.History) >= 26 {
-		// Complex Decision Engine with Confluence
-		if (rsi < 30 && price < sma && price <= bbLower) || divergence == "BULLISH" {
+		// Complex Decision Engine with Technical + Sentiment Confluence
+		isTechnicalBuy := (rsi < 35 && price < sma && price <= bbLower) || divergence == "BULLISH"
+		isTechnicalSell := (rsi > 65 && price > sma && price >= bbUpper) || divergence == "BEARISH"
+
+		if isTechnicalBuy && sentiment == "BULLISH" {
 			decision = "BUY"
-		} else if (rsi > 70 && price > sma && price >= bbUpper) || divergence == "BEARISH" {
+		} else if isTechnicalSell && sentiment == "BEARISH" {
 			decision = "SELL"
+		} else if isTechnicalBuy || isTechnicalSell {
+			fmt.Printf("[Trading] Technical signal rejected by %s sentiment.\n", sentiment)
 		}
 	} else {
 		fmt.Println("[Trading] Insufficient history for complex indicators (need 26 for MACD), defaulting to HOLD.")

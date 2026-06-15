@@ -111,6 +111,9 @@ func main() {
 	if os.Getenv("BINANCE_API_KEY") != "" {
 		fmt.Println("[Trading] Real execution enabled via Binance.")
 		executor = trading.NewBinanceExecutor()
+	} else if os.Getenv("KRAKEN_API_KEY") != "" {
+		fmt.Println("[Trading] Real execution enabled via Kraken.")
+		executor = trading.NewKrakenExecutor()
 	}
 
 	traderModule := &trading.TradingModule{
@@ -211,6 +214,23 @@ func main() {
 		if contentStr != "" {
 			fmt.Printf("[Social] Posting explicit content to %s: %s\n", platform, contentStr)
 			return provider.Post(orch, platform, contentStr)
+		}
+
+		if p.Get("action") == "engage" {
+			fmt.Printf("[Social] Engaging with topic: %s\n", topic)
+			posts, err := provider.Search(topic)
+			if err != nil {
+				return err
+			}
+			if len(posts) == 0 {
+				fmt.Println("[Social] No relevant posts found to engage with.")
+				return nil
+			}
+
+			// Engage with the first post
+			target := posts[0]
+			reply := social.GenerateContent(orch, "reply to: "+target.Content)
+			return provider.Reply(target.ID, reply)
 		}
 
 		social.SchedulePost(orch, provider, platform, topic)
