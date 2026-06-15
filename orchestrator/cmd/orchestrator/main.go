@@ -86,6 +86,11 @@ func main() {
 	swarm := orchestrator.NewMemorySwarm(orch, broker)
 	multiAgent := orchestrator.NewMultiAgentOrchestrator(orch, protocol, broker)
 
+	// Initialize Content Calendar
+	contentCalendar := publisher.NewContentCalendar()
+	contentCalendar.LoadCalendar()
+	orch.Calendar = contentCalendar
+
 	// ── Initialize Trading Module ──
 	var fetcher trading.PriceFetcher = &trading.MockPriceFetcher{}
 	if *realPrices {
@@ -346,6 +351,49 @@ func main() {
 			return err
 		}
 		fmt.Printf("[LeadGen] ✅ Discovered %d leads for %s\n", len(leads), topic)
+		return nil
+	})
+
+	protocol.Register("affiliate", func(p url.Values) error {
+		action := p.Get("action")
+		niche := p.Get("niche")
+		if niche == "" {
+			niche = "AI productivity tools"
+		}
+
+		if action == "discover" {
+			inserter := publisher.NewAffiliateInserter()
+			return inserter.DiscoverAffiliatePrograms(orch, niche)
+		}
+		return fmt.Errorf("unknown affiliate action: %s", action)
+	})
+
+	protocol.Register("outreach", func(p url.Values) error {
+		topic := p.Get("topic")
+		if topic == "" {
+			topic = "AI automation services"
+		}
+		pitches, err := research.GenerateOutreach(orch, topic)
+		if err != nil {
+			return err
+		}
+		fmt.Printf("[Outreach] ✅ Prepared %d personalized pitches for %s\n", len(pitches), topic)
+		return nil
+	})
+
+	protocol.Register("calendar", func(p url.Values) error {
+		action := p.Get("action")
+		if action == "process" {
+			pending := contentCalendar.GetPendingEntries()
+			fmt.Printf("[Calendar] Processing %d pending entries\n", len(pending))
+			for _, entry := range pending {
+				if err := contentCalendar.PublishEntry(&entry); err != nil {
+					fmt.Printf("[Calendar] ❌ Failed to publish %s: %v\n", entry.ID, err)
+				}
+			}
+		} else if action == "status" {
+			contentCalendar.PrintStatus()
+		}
 		return nil
 	})
 

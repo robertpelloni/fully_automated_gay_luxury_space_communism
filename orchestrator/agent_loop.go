@@ -162,6 +162,7 @@ Available modules and their parameters:
 - hustle://content?topic=TOPIC&type=TYPE — Generate monetizable content (type: blog, newsletter, seo, thread)
 - hustle://content?topic=TOPIC&type=TYPE&publish=true — Generate AND publish content to WordPress/Newsletter
 - hustle://leadgen?topic=TOPIC — Discover business leads for a topic
+- hustle://calendar?action=process — Process and publish scheduled content
 - hustle://chain?name=CHAIN_NAME — Execute a multi-step workflow chain
 - hustle://chain?action=discover — Discover and create new high-ROI workflow chains
 - hustle://healer?issue=DESCRIPTION — Diagnose and fix a problem
@@ -175,8 +176,9 @@ Iteration: %d | Successes: %d | Errors: %d
 
 STRATEGY GUIDELINES:
 1. Content generation has the HIGHEST ROI. Use hustle://content?type=blog&publish=true to maximize search traffic.
-2. High-ROI Chain: research -> leadgen -> content?type=newsletter&publish=true -> social.
-3. Research trending topics, discover leads, write about them in a newsletter, and post to social media to grow your audience.
+2. High-ROI Chain: research -> leadgen -> outreach -> content?type=newsletter&publish=true -> social.
+3. Use hustle://calendar?action=process daily to maintain a consistent publishing schedule across platforms.
+4. Research trending topics, discover leads, prepare outreach pitches, write about them in a newsletter, and post to social media to grow your audience.
 4. If errors are high, run healer. If profitable, double down on what works.
 5. Vary your actions — do NOT repeat the same action twice in a row.
 6. Use specific, targeted queries rather than generic ones.
